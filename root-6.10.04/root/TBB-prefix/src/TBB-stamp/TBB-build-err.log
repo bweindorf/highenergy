@@ -1,0 +1,255 @@
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent make rule.
+../../build/Makefile.tbb:32: CONFIG: cfg=debug arch=intel64 compiler=gcc target=linux runtime=cc7_libc2.27_kernel4.18.0
+In file included from ../../src/tbb/concurrent_queue.cpp:21:0:
+../../src/tbb/concurrent_queue.cpp: In member function ‘bool tbb::internal::micro_queue::pop(void*, tbb::internal::ticket, tbb::internal::concurrent_queue_base&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘p’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/concurrent_queue.cpp:252:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &p, NULL );
+     ^~~~~~~~~~~~
+In file included from ../../src/tbb/itt_notify.h:24:0,
+                 from ../../src/rml/include/../server/thread_monitor.h:42,
+                 from ../../src/tbb/private_server.cpp:22:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+In file included from ../../include/tbb/tbb_machine.h:117:0,
+                 from ../../src/tbb/scheduler_common.h:24,
+                 from ../../src/tbb/task.cpp:22:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+In file included from ../../include/tbb/tbb_machine.h:117:0,
+                 from ../../src/tbb/scheduler_common.h:24,
+                 from ../../src/tbb/scheduler.h:24,
+                 from ../../src/tbb/task_group_context.cpp:21:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+In file included from ../../include/tbb/task_scheduler_init.h:24:0,
+                 from ../../src/tbb/governor.h:24,
+                 from ../../src/tbb/governor.cpp:23:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+In file included from ../../src/tbb/market.cpp:21:0:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+In file included from ../../include/tbb/global_control.h:28:0,
+                 from ../../src/tbb/arena.cpp:21:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+In file included from ../../include/tbb/tbb_machine.h:117:0,
+                 from ../../src/tbb/scheduler_common.h:24,
+                 from ../../src/tbb/scheduler.h:24,
+                 from ../../src/tbb/custom_scheduler.h:24,
+                 from ../../src/tbb/scheduler.cpp:21:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+../../src/tbb/scheduler.cpp: In member function ‘void tbb::internal::generic_scheduler::local_spawn_root_and_wait(tbb::task&, tbb::task*&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘first’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/scheduler.cpp:655:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &first, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:62: warning: nonnull argument ‘t’ compared to NULL [-Wnonnull-compare]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                  ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+../../src/tbb/scheduler.cpp: In member function ‘void tbb::internal::generic_scheduler::local_spawn_root_and_wait(tbb::task&, tbb::task*&)’:
+../../include/tbb/tbb_stddef.h:138:62: warning: nonnull argument ‘first’ compared to NULL [-Wnonnull-compare]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                  ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/scheduler.cpp:655:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &first, NULL );
+     ^~~~~~~~~~~~
+In file included from ../../include/tbb/tbb_machine.h:117:0,
+                 from ../../src/tbb/scheduler_common.h:24,
+                 from ../../src/tbb/observer_proxy.h:26,
+                 from ../../src/tbb/observer_proxy.cpp:25:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+../../src/tbb/mailbox.h: In member function ‘void tbb::internal::mail_outbox::push(tbb::internal::task_proxy&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘t’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/tbb/mailbox.h:145:9: note: in expansion of macro ‘__TBB_ASSERT’
+         __TBB_ASSERT(&t, NULL);
+         ^~~~~~~~~~~~
+In file included from ../../include/tbb/global_control.h:28:0,
+                 from ../../src/tbb/tbb_main.cpp:22:
+../../src/tbb/scheduler_common.h: In function ‘void tbb::internal::assert_task_valid(const tbb::task&)’:
+../../src/tbb/scheduler_common.h:220:24: warning: the compiler can assume that the address of ‘task’ will never be NULL [-Waddress]
+     __TBB_ASSERT( &task!=NULL, NULL );
+                        ^
+../../include/tbb/tbb_stddef.h:138:52: note: in definition of macro ‘__TBB_ASSERT_RELEASE’
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                    ^~~~~~~~~
+../../src/tbb/scheduler_common.h:220:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &task!=NULL, NULL );
+     ^~~~~~~~~~~~
+In file included from ../../src/old/concurrent_queue_v2.h:24:0,
+                 from ../../src/old/concurrent_queue_v2.cpp:21:
+../../src/old/concurrent_queue_v2.cpp: In member function ‘bool tbb::internal::micro_queue::pop(void*, tbb::internal::micro_queue::ticket, tbb::internal::concurrent_queue_base&)’:
+../../include/tbb/tbb_stddef.h:138:134: warning: the compiler can assume that the address of ‘p’ will never be NULL [-Waddress]
+  #define __TBB_ASSERT_RELEASE(predicate,message) ((predicate)?((void)0) : tbb::assertion_failure(__FILE__,__LINE__,#predicate,message))
+                                                                                                                                      ^
+../../include/tbb/tbb_stddef.h:162:45: note: in expansion of macro ‘__TBB_ASSERT_RELEASE’
+     #define __TBB_ASSERT(predicate,message) __TBB_ASSERT_RELEASE(predicate,message)
+                                             ^~~~~~~~~~~~~~~~~~~~
+../../src/old/concurrent_queue_v2.cpp:180:5: note: in expansion of macro ‘__TBB_ASSERT’
+     __TBB_ASSERT( &p, NULL );
+     ^~~~~~~~~~~~
+../../build/Makefile.tbb:32: CONFIG: cfg=release arch=intel64 compiler=gcc target=linux runtime=cc7_libc2.27_kernel4.18.0
+../../src/tbbmalloc/proxy.cpp:234:32: warning: dynamic exception specifications are deprecated in C++11 [-Wdeprecated]
+ void * operator new(size_t sz) throw (std::bad_alloc) {
+                                ^~~~~
+../../src/tbbmalloc/proxy.cpp:242:33: warning: dynamic exception specifications are deprecated in C++11 [-Wdeprecated]
+ void* operator new[](size_t sz) throw (std::bad_alloc) {
+                                 ^~~~~
+../../src/tbbmalloc/proxy.cpp:234:32: warning: dynamic exception specifications are deprecated in C++11 [-Wdeprecated]
+ void * operator new(size_t sz) throw (std::bad_alloc) {
+                                ^~~~~
+../../src/tbbmalloc/proxy.cpp:242:33: warning: dynamic exception specifications are deprecated in C++11 [-Wdeprecated]
+ void* operator new[](size_t sz) throw (std::bad_alloc) {
+                                 ^~~~~

@@ -1,0 +1,1 @@
+/usr/bin/cc  -Wno-implicit-fallthrough -pipe -m64 -Wall -W -fPIC -pthread -fPIC -w -Werror=date-time -ffunction-sections -fdata-sections -O2 -DNDEBUG   -rdynamic -Wl,-allow-shlib-undefined  -Wl,-O3 -Wl,--gc-sections CMakeFiles/count.dir/count.c.o  -o ../../bin/count -lpthread 

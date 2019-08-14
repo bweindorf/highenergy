@@ -1,0 +1,14 @@
+-I/usr/include/qt4
+-I/usr/include/qt4/QtGui
+-I/usr/include/qt4/QtCore
+-I/usr/include/qt4/Qt3Support
+-D$<$<NOT:$<CONFIG:Debug>>:QT_NO_DEBUG>
+-DQT_GUI_LIB
+-DQT_CORE_LIB
+-DQT3_SUPPORT=
+-DQT3_SUPPORT_CONSTRUCTOR=
+-DQT_DLL
+-DQT_THREAD_SUPPORT
+-o
+/home/brandon/Projects/root-6.10.04/root/gui/qtgsi/inc/moc_TQRootCanvas.cxx
+/home/brandon/Projects/root-6.10.04/gui/qtgsi/inc/TQRootCanvas.h

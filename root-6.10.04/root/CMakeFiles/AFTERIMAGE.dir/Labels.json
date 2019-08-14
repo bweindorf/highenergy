@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/CMakeFiles/AFTERIMAGE"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/CMakeFiles/AFTERIMAGE.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/CMakeFiles/AFTERIMAGE-complete.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-install.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-mkdir.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-download.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-update.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-patch.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-configure.rule"
+		},
+		{
+			"file" : "/home/brandon/Projects/root-6.10.04/root/AFTERIMAGE-prefix/src/AFTERIMAGE-stamp/AFTERIMAGE-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"AFTERIMAGE"
+		],
+		"name" : "AFTERIMAGE"
+	}
+}

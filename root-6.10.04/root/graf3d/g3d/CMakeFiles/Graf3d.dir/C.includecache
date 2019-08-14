@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/brandon/Projects/root-6.10.04/graf3d/g3d/src/X3DBuffer.c
+X3DBuffer.h
+/home/brandon/Projects/root-6.10.04/graf3d/g3d/src/X3DBuffer.h
+../../x3d/src/X3DDefs.h
+/home/brandon/Projects/root-6.10.04/graf3d/x3d/src/X3DDefs.h
+stdio.h
+-
+stdlib.h
+-
+
+/home/brandon/Projects/root-6.10.04/graf3d/x3d/src/X3DDefs.h
+
+include/X3DBuffer.h
+

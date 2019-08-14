@@ -1,0 +1,40 @@
+#ifndef ROOT_RConfigure
+#define ROOT_RConfigure
+
+/* Configurations file for @architecture@ */
+#ifdef R__HAVE_CONFIG
+#define ROOTPREFIX    "@prefix@"
+#define ROOTBINDIR    "@bindir@"
+#define ROOTLIBDIR    "@libdir@"
+#define ROOTINCDIR    "@incdir@"
+#define ROOTETCDIR    "@etcdir@"
+#define ROOTDATADIR   "@datadir@"
+#define ROOTDOCDIR    "@docdir@"
+#define ROOTMACRODIR  "@macrodir@"
+#define ROOTTUTDIR    "@tutdir@"
+#define ROOTSRCDIR    "@srcdir@"
+#define ROOTICONPATH  "@iconpath@"
+#define TTFFONTDIR    "@ttffontdir@"
+#endif
+
+#define EXTRAICONPATH "@extraiconpath@"
+
+#@setresuid@ R__HAS_SETRESUID   /**/
+#@hasmathmore@ R__HAS_MATHMORE   /**/
+#@haspthread@ R__HAS_PTHREAD    /**/
+#@hasxft@ R__HAS_XFT    /**/
+#@hascocoa@ R__HAS_COCOA    /**/
+#@hasvc@ R__HAS_VC    /**/
+#@usec++11@ R__USE_CXX11    /**/
+#@usec++14@ R__USE_CXX14    /**/
+#@usec++17@ R__USE_CXX17    /**/
+#@uselibc++@ R__USE_LIBCXX    /**/
+#@hasstdstringview@ R__HAS_STD_STRING_VIEW   /**/
+#@hasstdexpstringview@ R__HAS_STD_EXPERIMENTAL_STRING_VIEW   /**/
+#@hasstodstringview@ R__HAS_STOD_STRING_VIEW /**/
+#@hasstdapply@ R__HAS_STD_APPLY /**/
+#@hasstdinvoke@ R__HAS_STD_INVOKE /**/
+#@hasllvm@ R__EXTERN_LLVMDIR @llvmdir@
+#@useimt@ R__USE_IMT   /**/
+
+#endif

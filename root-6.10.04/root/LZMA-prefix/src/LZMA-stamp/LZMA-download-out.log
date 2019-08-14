@@ -1,0 +1,11 @@
+-- verifying file...
+     file='/home/brandon/Projects/root-6.10.04/core/lzma/src/xz-5.2.1.tar.gz'
+-- verifying file... done
+-- extracting...
+     src='/home/brandon/Projects/root-6.10.04/core/lzma/src/xz-5.2.1.tar.gz'
+     dst='/home/brandon/Projects/root-6.10.04/root/LZMA-prefix/src/LZMA'
+-- extracting... [tar xfz]
+-- extracting... [analysis]
+-- extracting... [rename]
+-- extracting... [clean up]
+-- extracting... done
