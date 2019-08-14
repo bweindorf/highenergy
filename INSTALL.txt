@@ -1,0 +1,10 @@
+Editing a file:
+1. Make your edits
+2. Use "git add <name-of-file>" to have git track the new file or the new edits of a file ("git add --all" will have git track all files in current directory that have been created/edited)
+3. Use git commit -m <"message"> to commit the change (you can think of this like "saving the file")
+4. Use "git push" to push the changes to the server. If you configured your git directory correctly "git push" should work, if not, you may need to use "git push <URL>" or 'git push --set-upstream "<URL>  master"'
+
+
+Getting someone's edits:
+1. Use "git pull <URL>" to retrieve the current version of all files
+
