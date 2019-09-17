@@ -1,1 +1,1 @@
-Example DAT File
+Example dat File
