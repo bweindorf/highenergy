@@ -1,3 +1,22 @@
+Getting Git on Terminal:
+1. sudo apt-get install git
+2. mkdir git
+3. cd git
+4. mkdir <name of repo>
+5. git init
+6. git pull <URL>
+7. git config --global user.email <email>
+8. git config --global user.name <Name>
+9. // Make a file or edit one
+10. git add <file>
+11. git commit -m "update"
+12. git push <URL> // First time only
+13. git push --set-upstream <URL> master
+14. 
+
+
+
+
 Editing a file:
 1. Make your edits
 2. Use "git add <name-of-file>" to have git track the new file or the new edits of a file ("git add --all" will have git track all files in current directory that have been created/edited)
