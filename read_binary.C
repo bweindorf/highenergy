@@ -24,7 +24,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
-
+#include <iostream>
 
 #include <string.h>
 #include <stdio.h>
@@ -126,7 +126,7 @@ void decode(char *filename) {
    rec->Branch("amplitude2", &amplitude2,"amplitude2/D");
    rec->Branch("amplitude3", &amplitude3,"amplitude3/D");
    rec->Branch("amplitude4", &amplitude4,"amplitude4/D");
-   // create canvas
+   // create canvas (This also causes the window to appear at the end of the program)
    TCanvas *c1 = new TCanvas();
    
    // create graph
@@ -292,10 +292,14 @@ void decode(char *filename) {
       rec->Fill();
 
   //Uncomment the following to see couple waveforms of voltage vs time
-  /*   
+      printf("Coordinates:");
       // fill graph
-      for (i=0 ; i<1024 ; i++)
+      for (i=0 ; i<1024 ; i++){
          g->SetPoint(i, time[b][2][i], waveform[b][2][i]);
+         cout << time[b][2][i] << ", " << (waveform[b][2][i]) << "\n";
+      }
+
+         
       
       // draw graph and wait for user click
       g->SetTitle("Pulses for Particle Detector");
@@ -304,7 +308,7 @@ void decode(char *filename) {
       g->Draw("ACP");
       c1->Update();
       gPad->WaitPrimitive();
-*/
+
    } //loop over different boards
 
 } //loop over events 
