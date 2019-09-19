@@ -88,6 +88,8 @@ void decode(char *filename) {
    unsigned int scaler;
    unsigned short voltage[1024];
    double waveform[16][4][1024], time[16][4][1024];
+   double timeinitial, timemax, timefinal;
+   double waveinitial;
    float bin_width[16][4][1024];
    int i, j, b, chn, n, chn_index, n_boards;
    double t1, t2, dt;
@@ -285,19 +287,35 @@ void decode(char *filename) {
       for (i=0 ; i<1022; i++) {
          if (waveform[b][2][i]>max) {
             max=waveform[b][2][i];
+	    timemax = time[b][2][i];
        } 
       }
        amplitude3=max;
+
      // fill root tree
       rec->Fill();
 
   //Uncomment the following to see couple waveforms of voltage vs time
       printf("Coordinates:");
       // fill graph
+      timeinitial = 0;
       for (i=0 ; i<1024 ; i++){
          g->SetPoint(i, time[b][2][i], waveform[b][2][i]);
+	 if (waveform[b][2][i] >= .10 * amplitude3 && timeinitial < timemax) {
+	         waveinitial = waveform[b][2][i];
+	 	 timeinitial = time[b][2][i];
+	 }
+      //Maybe a while statement that will reset the values if the waveform decreases before the amplitude time
+
+
          cout << time[b][2][i] << ", " << (waveform[b][2][i]) << "\n";
       }
+	 cout << "Amplitude: " << amplitude3 << "\n";
+	 cout << "baseline: " << baseline;
+	 cout << "timeinitial: " << timeinitial << " timemax: " << timemax << "\n";
+	 cout << "waveinitial: " << waveinitial << "\n";
+	 cout << "Rise Time: " << timemax - timeinitial << "\n";
+      
 
          
       
