@@ -74,7 +74,6 @@ typedef struct {
 } CHEADER;
 
 /*-----------------------------------------------------------------------------*/
-
 //int main(int argc, const char * argv[])
 void decode(char *filename) {
 
@@ -89,16 +88,17 @@ void decode(char *filename) {
    unsigned short voltage[1024];
    double waveform[16][4][1024], time[16][4][1024];
    double timeinitial, timemax, timefinal;
-   double waveinitial;
+   double waveinitial, wavefinal;
    float bin_width[16][4][1024];
    int i, j, b, chn, n, chn_index, n_boards;
    double t1, t2, dt;
-   //char filename[256];
+  // char filename[256];
    char rootfile[256];
    int ndt;
    double threshold, sumdt, sumdt2;
    double sum, baseline, max,amplitude1,amplitude2, amplitude3,amplitude4;
-   
+   int ampindex, ampindex2;
+   double wave;
    // open the binary waveform file
    FILE *f = fopen(filename, "rb");
    if (f == NULL) {
@@ -288,6 +288,8 @@ void decode(char *filename) {
          if (waveform[b][2][i]>max) {
             max=waveform[b][2][i];
 	    timemax = time[b][2][i];
+	    ampindex = i;
+	    ampindex2 = i;
        } 
       }
        amplitude3=max;
@@ -296,25 +298,39 @@ void decode(char *filename) {
       rec->Fill();
 
   //Uncomment the following to see couple waveforms of voltage vs time
-      printf("Coordinates:");
       // fill graph
-      timeinitial = 0;
+ //     timeinitial = 0;
       for (i=0 ; i<1024 ; i++){
          g->SetPoint(i, time[b][2][i], waveform[b][2][i]);
-	 if (waveform[b][2][i] >= .10 * amplitude3 && timeinitial < timemax) {
-	         waveinitial = waveform[b][2][i];
-	 	 timeinitial = time[b][2][i];
-	 }
-      //Maybe a while statement that will reset the values if the waveform decreases before the amplitude time
-
-
-         cout << time[b][2][i] << ", " << (waveform[b][2][i]) << "\n";
       }
+      
+
+      while(wave >= .10 * amplitude3){ // Start in middle, go back in time, first time it reaches 10% of the wave: timeinitial
+	      ampindex -= 1;
+	      wave = waveform[b][2][ampindex];
+      }
+      waveinitial = wave;
+      timeinitial = time[b][2][ampindex];
+      wave = amplitude3;
+      while(wave >= .10 * amplitude3){ // Start in middle, go forward in time, first time it reaches 10% of the wave: timefinal
+              ampindex2 += 1;
+              wave = waveform[b][2][ampindex2];
+      }
+      wavefinal = wave;
+      timefinal = time[b][2][ampindex2];
+        
+
+        
 	 cout << "Amplitude: " << amplitude3 << "\n";
-	 cout << "baseline: " << baseline;
-	 cout << "timeinitial: " << timeinitial << " timemax: " << timemax << "\n";
+	 cout << "baseline: " << baseline << "\n";
+	 cout << "timeinitial: " << timeinitial << "\n";
+	 cout << "timemax: " << timemax << "\n";
 	 cout << "waveinitial: " << waveinitial << "\n";
 	 cout << "Rise Time: " << timemax - timeinitial << "\n";
+	 cout << "timefinal: " << timefinal << "\n";
+	 cout << "wavefinal: " << wavefinal << "\n";
+	 cout << "Fall time: " << timefinal - timemax << "\n";
+	 cout << "total time: " << timefinal - timeinitial << "\n\n\n\n";
       
 
          
