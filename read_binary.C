@@ -286,6 +286,7 @@ void decode(char *filename) {
      max=-10000.0;
       for (i=0 ; i<1022; i++) {
          if (waveform[b][2][i]>max) {
+	    
             max=waveform[b][2][i];
 	    timemax = time[b][2][i];
 	    ampindex = i;
@@ -302,9 +303,10 @@ void decode(char *filename) {
  //     timeinitial = 0;
       for (i=0 ; i<1024 ; i++){
          g->SetPoint(i, time[b][2][i], waveform[b][2][i]);
-      }
+        //	 cout << "Time: " << time[b][2][i] << " Wave: " << waveform[b][2][i] << "\n";
+      } 
       
-
+      wave = amplitude3;
       while(wave >= .10 * amplitude3){ // Start in middle, go back in time, first time it reaches 10% of the wave: timeinitial
 	      ampindex -= 1;
 	      wave = waveform[b][2][ampindex];
@@ -320,7 +322,7 @@ void decode(char *filename) {
       timefinal = time[b][2][ampindex2];
         
 
-        
+    
 	 cout << "Amplitude: " << amplitude3 << "\n";
 	 cout << "baseline: " << baseline << "\n";
 	 cout << "timeinitial: " << timeinitial << "\n";
