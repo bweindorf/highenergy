@@ -30,8 +30,10 @@
 #include <stdio.h>
 #include "TFile.h"
 #include "TTree.h"
+#include "TLine.h"
 #include "TString.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
 #include "TCanvas.h"
 #include "Getline.h"
 #include "TAxis.h"
@@ -335,15 +337,35 @@ void decode(char *filename) {
 	 cout << "total time: " << timefinal - timeinitial << "\n\n\n\n";
       
 
-         
-      
+     
       // draw graph and wait for user click
-      g->SetTitle("Pulses for Particle Detector");
-      g->GetXaxis()->SetTitle("Time (ns)");
-      g->GetYaxis()->SetTitle("Voltage (V)");
-      g->Draw("ACP");
+//      g->SetTitle("Pulses for Particle Detector");
+//      g->GetXaxis()->SetTitle("Time (ns)");
+//      g->GetYaxis()->SetTitle("Voltage (V)");
+//      g->Draw("ACP");
+//      c1->Update();
+//      gPad->WaitPrimitive();
+
+
+      //Make Initial Time Vetical Line
+      double *x;
+      double *y;
+      TGraph *ti = new TGraph(2, (double *)x, (double *)y);
+      ti->SetPoint(0, timeinitial, 0);
+      ti->SetPoint(1, timeinitial, amplitude3);
+//      ti->SetLineWidth(50);
+//      ti->SetLineColor(4);
+//      ti->Draw("pl same");
+//      c1->Update();
+    
+
+      TMultiGraph *mg = new TMultiGraph();
+      mg->Add(g, "C");
+      mg->Add(ti, "L");
+      mg->Draw("A");
       c1->Update();
       gPad->WaitPrimitive();
+
 
    } //loop over different boards
 
