@@ -353,8 +353,8 @@ void decode(char *filename) {
       TGraph *ti = new TGraph(2, (double *)x, (double *)y);
       ti->SetPoint(0, timeinitial, 0);
       ti->SetPoint(1, timeinitial, amplitude3);
-//      ti->SetLineWidth(50);
-//      ti->SetLineColor(4);
+      ti->SetLineWidth(5);
+      ti->SetLineColor(2);
 //      ti->Draw("pl same");
 //      c1->Update();
     
