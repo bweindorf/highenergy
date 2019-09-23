@@ -338,32 +338,43 @@ void decode(char *filename) {
       
 
      
-      // draw graph and wait for user click
-//      g->SetTitle("Pulses for Particle Detector");
-//      g->GetXaxis()->SetTitle("Time (ns)");
-//      g->GetYaxis()->SetTitle("Voltage (V)");
+      // Alter main graph
 //      g->Draw("ACP");
 //      c1->Update();
 //      gPad->WaitPrimitive();
 
 
       //Make Initial Time Vetical Line
-      double *x;
-      double *y;
-      TGraph *ti = new TGraph(2, (double *)x, (double *)y);
+      double *xi;
+      double *yi;
+      TGraph *ti = new TGraph(2, (double *)xi, (double *)yi);
       ti->SetPoint(0, timeinitial, 0);
       ti->SetPoint(1, timeinitial, amplitude3);
-      ti->SetLineWidth(5);
+      ti->SetLineWidth(2);
       ti->SetLineColor(2);
-//      ti->Draw("pl same");
-//      c1->Update();
+
+      //Make Final Time Vertical Line
+      double *xf;
+      double *yf;
+      TGraph *tf = new TGraph(2, (double *)xf, (double * )yf);
+      tf->SetPoint(0, timefinal, 0);
+      tf->SetPoint(1, timefinal, amplitude3);
+      tf->SetLineWidth(2);
+      tf->SetLineColor(2);
     
 
       TMultiGraph *mg = new TMultiGraph();
-      mg->Add(g, "C");
+      //Add and Draw Graphs
+      mg->Add(g, "CP");
       mg->Add(ti, "L");
+      mg->Add(tf, "L");
       mg->Draw("A");
+      mg->SetTitle("Pulses for Particle Detector");
+      mg->GetXaxis()->SetTitle("Time (ns)");
+      mg->GetYaxis()->SetTitle("Voltage (V)");
+      //Wait for User to click
       c1->Update();
+      gPad->Modified();
       gPad->WaitPrimitive();
 
 
