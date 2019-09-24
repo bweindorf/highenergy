@@ -30,8 +30,10 @@
 #include <stdio.h>
 #include "TFile.h"
 #include "TTree.h"
+#include "TLine.h"
 #include "TString.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
 #include "TCanvas.h"
 #include "Getline.h"
 #include "TAxis.h"
@@ -286,6 +288,7 @@ void decode(char *filename) {
      max=-10000.0;
       for (i=0 ; i<1022; i++) {
          if (waveform[b][2][i]>max) {
+	    
             max=waveform[b][2][i];
 	    timemax = time[b][2][i];
 	    ampindex = i;
@@ -302,9 +305,10 @@ void decode(char *filename) {
  //     timeinitial = 0;
       for (i=0 ; i<1024 ; i++){
          g->SetPoint(i, time[b][2][i], waveform[b][2][i]);
-      }
+        //	 cout << "Time: " << time[b][2][i] << " Wave: " << waveform[b][2][i] << "\n";
+      } 
       
-
+      wave = amplitude3;
       while(wave >= .10 * amplitude3){ // Start in middle, go back in time, first time it reaches 10% of the wave: timeinitial
 	      ampindex -= 1;
 	      wave = waveform[b][2][ampindex];
@@ -320,7 +324,7 @@ void decode(char *filename) {
       timefinal = time[b][2][ampindex2];
         
 
-        
+    
 	 cout << "Amplitude: " << amplitude3 << "\n";
 	 cout << "baseline: " << baseline << "\n";
 	 cout << "timeinitial: " << timeinitial << "\n";
@@ -333,15 +337,46 @@ void decode(char *filename) {
 	 cout << "total time: " << timefinal - timeinitial << "\n\n\n\n";
       
 
-         
-      
-      // draw graph and wait for user click
-      g->SetTitle("Pulses for Particle Detector");
-      g->GetXaxis()->SetTitle("Time (ns)");
-      g->GetYaxis()->SetTitle("Voltage (V)");
-      g->Draw("ACP");
+     
+      // Alter main graph
+//      g->Draw("ACP");
+//      c1->Update();
+//      gPad->WaitPrimitive();
+
+
+      //Make Initial Time Vetical Line
+      double *xi;
+      double *yi;
+      TGraph *ti = new TGraph(2, (double *)xi, (double *)yi);
+      ti->SetPoint(0, timeinitial, 0);
+      ti->SetPoint(1, timeinitial, amplitude3);
+      ti->SetLineWidth(2);
+      ti->SetLineColor(2);
+
+      //Make Final Time Vertical Line
+      double *xf;
+      double *yf;
+      TGraph *tf = new TGraph(2, (double *)xf, (double * )yf);
+      tf->SetPoint(0, timefinal, 0);
+      tf->SetPoint(1, timefinal, amplitude3);
+      tf->SetLineWidth(2);
+      tf->SetLineColor(2);
+    
+
+      TMultiGraph *mg = new TMultiGraph();
+      //Add and Draw Graphs
+      mg->Add(g, "CP");
+      mg->Add(ti, "L");
+      mg->Add(tf, "L");
+      mg->Draw("A");
+      mg->SetTitle("Pulses for Particle Detector");
+      mg->GetXaxis()->SetTitle("Time (ns)");
+      mg->GetYaxis()->SetTitle("Voltage (V)");
+      //Wait for User to click
       c1->Update();
+      gPad->Modified();
       gPad->WaitPrimitive();
+
 
    } //loop over different boards
 
