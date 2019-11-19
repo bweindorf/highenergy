@@ -372,6 +372,7 @@ void decode(char *filename) {
       mg->Add(g, "CP");
       mg->Add(ti, "L");
       mg->Add(tf, "L");
+      mg->Draw("A");
 //      c1->Update();
       mg->SetTitle("Pulses for Particle Detector");
       mg->GetXaxis()->SetTitle("Time (ns)");
@@ -379,7 +380,6 @@ void decode(char *filename) {
       //Wait for User to click
       c1->Update();
       gPad->Modified();
-      mg->Draw("A");
       gPad->WaitPrimitive();
 
 
