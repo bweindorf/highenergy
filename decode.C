@@ -370,7 +370,6 @@ void decode(char *filename) {
       mg->Add(ti, "L");
       mg->Add(tf, "L");
       mg->Draw("A");
-      gPad->Update();
       mg->SetTitle("Pulses for Particle Detector");
       mg->GetXaxis()->SetTitle("Time (ns)");
       mg->GetYaxis()->SetTitle("Voltage (V)");
