@@ -99,7 +99,8 @@ void decode(char *filename) {
    int ndt;
    double threshold, sumdt, sumdt2;
    double sum, baseline, max,amplitude1,amplitude2, amplitude3,amplitude4;
-   int ampindex, ampindex2;
+   int ampindex = 0;
+   int  ampindex2 = 0;
    double wave;
    // open the binary waveform file
    FILE *f = fopen(filename, "rb");
@@ -168,7 +169,7 @@ void decode(char *filename) {
       printf("Found data for board #%d\n", bh.board_serial_number);
       
       // read time bin widths
-      memset(bin_width[b], sizeof(bin_width[0]), 0);
+      memset(bin_width[b], sizeof(bin_width[0]), (0));
       for (chn=0 ; chn<5 ; chn++) {
          fread(&ch, sizeof(ch), 1, f);
          if (ch.c[0] != 'C') {
@@ -340,10 +341,12 @@ void decode(char *filename) {
 
      
       // Alter main graph
-//      g->Draw("ACP");
-//      c1->Update();
-//      gPad->WaitPrimitive();
+/*      g->Draw("ACP");
+      gPad->Update();
+      c1->Update();
+      gPad->WaitPrimitive();
 
+*/
 
       //Make Initial Time Vetical Line
       double *xi;
@@ -370,6 +373,7 @@ void decode(char *filename) {
       mg->Add(ti, "L");
       mg->Add(tf, "L");
       mg->Draw("A");
+//      c1->Update();
       mg->SetTitle("Pulses for Particle Detector");
       mg->GetXaxis()->SetTitle("Time (ns)");
       mg->GetYaxis()->SetTitle("Voltage (V)");
@@ -390,4 +394,3 @@ void decode(char *filename) {
    outfile->Close();
    return;
 }
-
