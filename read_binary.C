@@ -369,17 +369,17 @@ void decode(char *filename) {
 
       TMultiGraph *mg = new TMultiGraph();
       //Add and Draw Graphs
-//      mg->Add(g, "CP");
-//      mg->Add(ti, "L");
+      mg->Add(g, "CP");
+      mg->Add(ti, "L");
       mg->Add(tf, "L");
-      mg->Draw("A");
-//      gPad->Update();
+//      c1->Update();
       mg->SetTitle("Pulses for Particle Detector");
       mg->GetXaxis()->SetTitle("Time (ns)");
       mg->GetYaxis()->SetTitle("Voltage (V)");
       //Wait for User to click
       c1->Update();
       gPad->Modified();
+      mg->Draw("A");
       gPad->WaitPrimitive();
 
 
@@ -394,4 +394,3 @@ void decode(char *filename) {
    outfile->Close();
    return;
 }
-
