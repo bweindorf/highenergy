@@ -279,7 +279,8 @@ void decode(char *filename) {
             sumdt += dt;
             sumdt2 += dt*dt;
          }
-     //Find baseline for channel 3 to get amplitude for ch3 
+// CHANGE CHANNEL NOW
+   	 //Find baseline for channel 3 to get amplitude for ch3 
      sum=0.0;
       for (i=0 ; i<10; i++) {
          sum+=waveform[0][2][i];
@@ -300,7 +301,7 @@ void decode(char *filename) {
 
      // fill root tree
       rec->Fill();
-
+/*
   //Uncomment the following to see couple waveforms of voltage vs time
       // fill graph
  //     timeinitial = 0;
@@ -341,12 +342,12 @@ void decode(char *filename) {
 
      
       // Alter main graph
-/*      g->Draw("ACP");
+      g->Draw("ACP");
       gPad->Update();
       c1->Update();
-      gPad->WaitPrimitive();
+//      gPad->WaitPrimitive();
 
-*/
+
 
       //Make Initial Time Vetical Line
       double *xi;
@@ -373,11 +374,8 @@ void decode(char *filename) {
       mg->Add(ti, "L");
       mg->Add(tf, "L");
       mg->Draw("A");
-<<<<<<< HEAD
       gPad->Update();
-=======
 //      c1->Update();
->>>>>>> 54cffb5f0040b907ed0c1f488c251620f6ff9b62
       mg->SetTitle("Pulses for Particle Detector");
       mg->GetXaxis()->SetTitle("Time (ns)");
       mg->GetYaxis()->SetTitle("Voltage (V)");
@@ -386,7 +384,7 @@ void decode(char *filename) {
       gPad->Modified();
       gPad->WaitPrimitive();
 
-
+*/
    } //loop over different boards
 
 } //loop over events 
