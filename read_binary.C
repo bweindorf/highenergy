@@ -1,5 +1,4 @@
 /*
- 
    Name:           read_binary.C
    Created by:     Stefan Ritt <stefan.ritt@psi.ch>
    Date:           July 30th, 2014
@@ -349,15 +348,17 @@ void decode(char *filename) {
 */
 
       //Make Initial Time Vetical Line
-      double *xi;
-      double *yi;
-      TGraph *ti = new TGraph(2, (double *)xi, (double *)yi);
+      double *xi = (double *)malloc(sizeof(double)*100);
+      double *yi = (double *)malloc(sizeof(double)*100);
+      TGraph *ti = new TGraph(2, xi, yi);
       ti->SetPoint(0, timeinitial, 0);
       ti->SetPoint(1, timeinitial, amplitude3);
       ti->SetLineWidth(2);
       ti->SetLineColor(2);
-
-      //Make Final Time Vertical Line
+      ti->Draw("L");
+//      gPad->WaitPrimitive();
+      
+/*      //Make Final Time Vertical Line
       double *xf;
       double *yf;
       TGraph *tf = new TGraph(2, (double *)xf, (double * )yf);
@@ -382,7 +383,7 @@ void decode(char *filename) {
       gPad->Modified();
       gPad->WaitPrimitive();
 
-
+*/
    } //loop over different boards
 
 } //loop over events 
