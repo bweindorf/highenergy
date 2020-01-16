@@ -282,16 +282,16 @@ void decode(char *filename) {
    	 //Find baseline for channel 3 to get amplitude for ch3 
      sum=0.0;
       for (i=0 ; i<10; i++) {
-         sum+=waveform[0][2][i];
+         sum+=waveform[0][0][i];
        } 
        baseline=sum/10;
      //Find amplitude for channel 3 (this is example channel )
      max=-10000.0;
       for (i=0 ; i<1022; i++) {
-         if (waveform[b][2][i]>max) {
+         if (waveform[b][0][i]>max) {
 	    
-            max=waveform[b][2][i];
-	    timemax = time[b][2][i];
+            max=waveform[b][0][i];
+	    timemax = time[b][0][i];
 	    ampindex = i;
 	    ampindex2 = i;
        } 
@@ -300,30 +300,30 @@ void decode(char *filename) {
 
      // fill root tree
       rec->Fill();
-/*
+
   //Uncomment the following to see couple waveforms of voltage vs time
       // fill graph
  //     timeinitial = 0;
       for (i=0 ; i<1024 ; i++){
-	 cout << "Time: " << time[b][2][i] << "Wave: " << waveform[b][2][i] << "\n";
-         g->SetPoint(i, time[b][2][i], waveform[b][2][i]);
+	 cout << "Time: " << time[b][0][i] << "Wave: " << waveform[b][2][i] << "\n";
+         g->SetPoint(i, time[b][0][i], waveform[b][0][i]);
         //	 cout << "Time: " << time[b][2][i] << " Wave: " << waveform[b][2][i] << "\n";
       } 
       
       wave = amplitude3;
       while(wave >= .10 * amplitude3){ // Start in middle, go back in time, first time it reaches 10% of the wave: timeinitial
 	      ampindex -= 1;
-	      wave = waveform[b][2][ampindex];
+	      wave = waveform[b][0][ampindex];
       }
       waveinitial = wave;
-      timeinitial = time[b][2][ampindex];
+      timeinitial = time[b][0][ampindex];
       wave = amplitude3;
       while(wave >= .10 * amplitude3){ // Start in middle, go forward in time, first time it reaches 10% of the wave: timefinal
               ampindex2 += 1;
-              wave = waveform[b][2][ampindex2];
+              wave = waveform[b][0][ampindex2];
       }
       wavefinal = wave;
-      timefinal = time[b][2][ampindex2];
+      timefinal = time[b][0][ampindex2];
         
 
     
@@ -385,7 +385,7 @@ void decode(char *filename) {
       gPad->Modified();
       gPad->WaitPrimitive();
 
-*/
+
    } //loop over different boards
 
 } //loop over events 
