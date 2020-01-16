@@ -1,7 +1,0 @@
-[ libGdml.so ]
-# List of selected classes
-class TGDMLParse
-class TGDMLRefl
-class TGDMLWrite
-header TGDMLParse.h
-header TGDMLWrite.h

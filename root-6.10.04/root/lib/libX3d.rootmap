@@ -1,4 +1,0 @@
-[ libX3d.so ]
-# List of selected classes
-class TViewerX3D
-header TViewerX3D.h

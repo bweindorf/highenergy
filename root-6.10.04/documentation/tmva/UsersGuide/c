@@ -1,1 +1,0 @@
-latex TMVAUsersGuide.tex; dvips TMVAUsersGuide -o TMVAUsersGuide.ps; makeindex TMVAUsersGuide.idx; 

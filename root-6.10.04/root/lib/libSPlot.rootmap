@@ -1,4 +1,0 @@
-[ libSPlot.so ]
-# List of selected classes
-class TSPlot
-header TSPlot.h

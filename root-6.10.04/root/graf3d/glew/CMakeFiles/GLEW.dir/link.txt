@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC  -Wno-implicit-fallthrough -pipe -m64 -Wall -W -fPIC -pthread -O2 -g -DNDEBUG  -Wl,--no-undefined -shared -Wl,-soname,libGLEW.so -o ../../lib/libGLEW.so CMakeFiles/GLEW.dir/src/glew.c.o /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libGLU.so 

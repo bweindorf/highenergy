@@ -1,4 +1,0 @@
-[ libASImageGui.so ]
-# List of selected classes
-class TASPaletteEditor
-header TASPaletteEditor.h

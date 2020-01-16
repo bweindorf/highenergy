@@ -1,4 +1,0 @@
-[ libSpectrumPainter.so ]
-# List of selected classes
-class TSpectrum2Painter
-header TSpectrum2Painter.h

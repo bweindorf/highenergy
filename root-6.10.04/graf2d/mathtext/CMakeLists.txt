@@ -1,2 +1,0 @@
-ROOT_LINKER_LIBRARY(mathtext *.cxx TYPE STATIC)
-

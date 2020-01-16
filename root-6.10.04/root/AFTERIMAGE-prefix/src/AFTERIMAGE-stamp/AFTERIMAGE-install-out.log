@@ -1,6 +1,0 @@
-/bin/mkdir -p /home/brandon/Projects/root-6.10.04/root/include/libAfterImage
-installing libAfterImage headers using command - 
-    "/usr/bin/install -c -m 644 <header> /home/brandon/Projects/root-6.10.04/root/include/libAfterImage" :
-afterimage.h afterbase.h ascmap.h asfont.h asim_afterbase.h asimage.h asimagexml.h asstorage.h asvisual.h blender.h bmp.h char2uni.h draw.h export.h imencdec.h import.h pixmap.h scanline.h transform.h ungif.h xcf.h ximage.h xpm.h xwrap.h 
-Done.
-/usr/bin/install -c -m 755 libAfterImage.a /home/brandon/Projects/root-6.10.04/root/lib

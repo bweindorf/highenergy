@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libminicern.a  CMakeFiles/minicern.dir/src/cernlib.c.o CMakeFiles/minicern.dir/src/hbook.f.o CMakeFiles/minicern.dir/src/kernlib.f.o CMakeFiles/minicern.dir/src/zebra.f.o
-/usr/bin/ranlib ../../lib/libminicern.a

@@ -1,6 +1,0 @@
-{ decls }
-namespace ROOT {  }
-
-[ libImt.so ]
-# List of selected classes
-class ROOT::TThreadExecutor

@@ -1,8 +1,0 @@
-[ libFumili.so ]
-# List of selected classes
-class TFumili
-class TFumiliMinimizer
-header TFumili.h
-header TFumiliMinimizer.h
-# List of selected vars
-var gFumili

@@ -1,1 +1,0 @@
-/usr/bin/f95   -rdynamic  -m64 -std=legacy -O2 -g -DNDEBUG CMakeFiles/g2root.dir/src/g2root.f.o  -o ../bin/g2root ../lib/libminicern.a -lgfortran -lm -lgcc_s -lgcc -lquadmath -lc -lm -lgcc_s -lgcc -lquadmath -lc 

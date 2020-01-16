@@ -1,4 +1,0 @@
-[ libFITSIO.so ]
-# List of selected classes
-class TFITSHDU
-header TFITS.h
