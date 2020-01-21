@@ -5,13 +5,19 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gui_pkg-bweindorf",
-    version="0.0.1",
+    version="0.0.4",
     author="Brandon Weindorf",
     author_email="bjweindorf@gmail.com",
     description="Gui For High Energy Data Analysis",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/bweindorf/highenergy.git",
+    install_requires=["matplotlib"],
+    entry_points={
+        "console_scripts": [
+            "gui-pkg=gui_pkg.app:main",
+            ]
+    },
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

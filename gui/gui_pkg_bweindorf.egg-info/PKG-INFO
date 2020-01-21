@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: gui-pkg-bweindorf
+Version: 0.0.4
+Summary: Gui For High Energy Data Analysis
+Home-page: https://github.com/bweindorf/highenergy.git
+Author: Brandon Weindorf
+Author-email: bjweindorf@gmail.com
+License: UNKNOWN
+Description: # Example Package
+        
+        This the beginning of the GUI package.
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
