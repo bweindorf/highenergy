@@ -1,9 +1,11 @@
+import os
 import wx
 import wx.lib.agw.aui as aui
 import wx.lib.mixins.inspection as wit
 import matplotlib as mpl
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
+#import wx.lib.agw.multidirdialog as MDD
 import wx.lib.inspection
 
 
@@ -81,6 +83,7 @@ class MainPanel(wx.Panel):
         #need to add parent attribute so that plotter can call within this class, timing issue here????
         self.parent = parent
         self.InitForm()        
+        self.currentDirectory = os.getcwd()
         
 
     def InitForm(self):
@@ -89,9 +92,12 @@ class MainPanel(wx.Panel):
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
         controlSizer = wx.BoxSizer(wx.VERTICAL)
         resultSizer = wx.BoxSizer(wx.VERTICAL)
+        fileSizer = wx.BoxSizer(wx.HORIZONTAL)
 
         
         #Make useable things
+        self.filename = wx.StaticText(self, id=wx.ID_ANY, label="No File Currently Selected")
+        browser = wx.Button(self, wx.ID_ANY, 'Browse')
         next_button = wx.Button(self, wx.ID_ANY, 'Next')
         next_button.Hide()
         prev_button = wx.Button(self, wx.ID_ANY, "Previous")
@@ -101,15 +107,18 @@ class MainPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.analyze(next_button, prev_button), analyze_button)
         self.Bind(wx.EVT_BUTTON, self.next, next_button)
         self.Bind(wx.EVT_BUTTON, self.previous, prev_button)
-            
+        self.Bind(wx.EVT_BUTTON, self.onOpenFile, browser)   
         #Add contents to each sizer
         controlSizer.Add(ctext, 0, wx.CENTER|wx.TOP, 0)
         controlSizer.Add(analyze_button, 0, wx.ALL, 5)
         
         buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
-        buttonSizer.Add(prev_button, 0, wx.ALL, 5)
-        buttonSizer.Add(next_button, 0, wx.ALL, 5)
+        buttonSizer.Add(prev_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
+        buttonSizer.Add(next_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
         controlSizer.Add(buttonSizer, 0, wx.ALL|wx.EXPAND, 0)
+        fileSizer.Add(self.filename, 0, wx.ALL, 0)
+        fileSizer.Add(browser, 0, wx.ALL, 0)
+        controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
         #controlSizer.Add(res_button, 0, wx.ALL, 5)
         self.mainSizer.Add(controlSizer, 1, wx.ALL, 0)
         self.mainSizer.Add(resultSizer, 1, wx.ALL, 5)
@@ -119,7 +128,29 @@ class MainPanel(wx.Panel):
         self.mainSizer.Fit(self)
         self.Layout()
 
-
+    def onOpenFile(self, event):
+#            """
+#           Create and show the Open FileDialog
+#          """
+        dlg = wx.FileDialog(
+        self, message="Choose a file",
+        defaultDir=self.currentDirectory, 
+        defaultFile="",
+        wildcard="dat files (*.dat)|*.dat",
+        style=wx.FD_OPEN | wx.FD_MULTIPLE | wx.FD_CHANGE_DIR
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            filepath = ""
+            paths = dlg.GetPaths()
+            print("You chose the following file(s):")
+            print(paths)
+            paths = paths[0].split("/")
+            f = paths[-1]
+            self.filename.SetLabel(f)
+            f = open(f, "r")
+            print(f.read())
+        dlg.Destroy()
+ 
 
 # Note about syntax, usually you Bind functions by calling them by name (myFunc as opposed to
 # myFunc() which would cause the function to execute immediately upon binding. If you want to bind a function
@@ -199,3 +230,8 @@ def main():
     app=MainApp()
 #    wx.lib.inspection.InspectionTool().Show()
     app.MainLoop() 
+
+
+if __name__ == "__main__":
+    main()
+
