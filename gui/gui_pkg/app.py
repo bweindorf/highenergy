@@ -107,11 +107,64 @@ class MainPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.analyze(next_button, prev_button), analyze_button)
         self.Bind(wx.EVT_BUTTON, self.next, next_button)
         self.Bind(wx.EVT_BUTTON, self.previous, prev_button)
-        self.Bind(wx.EVT_BUTTON, self.onOpenFile, browser)   
+        self.Bind(wx.EVT_BUTTON, self.onOpenFile, browser)
+        self.stats = wx.BoxSizer(wx.VERTICAL)
+        stats = wx.StaticText(self, id=wx.ID_ANY, label = "Statistics")
+        #Create Horizontal Sizers for each characteristic "Key Value Pair"
+        charkeyvalsizer = wx.BoxSizer(wx.HORIZONTAL)
+        keysizer=wx.BoxSizer(wx.VERTICAL)
+        valsizer=wx.BoxSizer(wx.VERTICAL)
+       ## risetimesizer=wx.BoxSizer(wx.HORIZONTAL)
+       ## risetimevalsizer=wx.BoxSizer(wx.HORIZONTAL)
+       ## peaktimesizer=wx.BoxSizer(wx.HORIZONTAL)
+       ## peaktimevalsizer=wx.BoxSizer(wxx.HORIZONTAL)
+       ## falltimesizer=wx.BoxSizer(wx.HORIZONTAL)
+       ## falltimevalsizer=wx.BoxSizer(wx.HORIZONTAL)
+       ## chargesizer=wx.BoxSizer(wx.HORIZONTAL)
+       ## chargevalsizer=wx.BoxSizer(wx.HORIZONTAL)
+        #Create Labels for each Characteristic
+        risetime = wx.StaticText(self, id=wx.ID_ANY, label = "Rise Time")
+        peaktime = wx.StaticText(self, id=wx.ID_ANY, label = "Peak Time")
+        falltime = wx.StaticText(self, id=wx.ID_ANY, label = "Fall Time")
+        charge = wx.StaticText(self, id=wx.ID_ANY, label = "Charge")
+        #Create blank labels for the actual values to go in  
+        self.risetimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Rise Val")
+        self.peaktimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Peak Val")
+        self.falltimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Fall Val")
+        self.chargeval = wx.StaticText(self, id=wx.ID_ANY, label = "Charge Val")
+        #Add keys and values to respective sizers
+        keysizer.Add(risetime, 0, wx.ALIGN_LEFT,0)
+        keysizer.Add(peaktime, 0, wx.ALIGN_LEFT, 0)
+        keysizer.Add(falltime, 0, wx.ALIGN_LEFT, 0)
+        keysizer.Add(charge, 0, wx.ALIGN_LEFT, 0)
+        valsizer.Add(self.risetimeval, 0, wx.ALIGN_LEFT, 0)
+        valsizer.Add(self.peaktimeval, 0, wx.ALIGN_LEFT, 0)
+        valsizer.Add(self.falltimeval, 0, wx.ALIGN_LEFT, 0)
+        valsizer.Add(self.chargeval, 0, wx.ALIGN_LEFT, 0)
+        charkeyvalsizer.Add(keysizer, 0, wx.ALL, 0)
+        charkeyvalsizer.Add(20,0,0)
+        charkeyvalsizer.Add(valsizer, 0, wx.ALL, 0)
+ 
+        ##risetimesizer.Add(risetime, 0, wx.EXPAND, 0)
+        ##risetimesizer.Add(self.risetimeval, 0, wx.EXPAND, 0)
+        ##peaktimesizer.Add(peaktime, 0, wx.ALIGN_LEFT, 5)
+        ##peaktimesizer.Add(self.peaktimeval, 0, wx.ALIGN_RIGHT, 5)
+        ##falltimesizer.Add(falltime, 0, wx.ALIGN_LEFT, 5)
+        ##alltimesizer.Add(self.falltimeval, 0, wx.ALIGN_RIGHT, 5)
+        ##chargesizer.Add(charge, 0, wx.ALIGN_LEFT, 5)
+        ##chargesizer.Add(self.chargeval, 0, wx.ALIGN_LEFT, 5)
         #Add contents to each sizer
         controlSizer.Add(ctext, 0, wx.CENTER|wx.TOP, 0)
         controlSizer.Add(analyze_button, 0, wx.ALL, 5)
-        
+        #Add characteristinc labels to stats sizer
+        self.stats.Add(stats, 0, wx.ALIGN_CENTER, 0)
+        self.stats.Add(charkeyvalsizer, 0, wx.ALIGN_LEFT, 0)
+        ##self.stats.Add(risetimesizer, 0, wx.ALIGN_LEFT, 0)
+        ##self.stats.Add(peaktimesizer, 0, wx.ALIGN_LEFT, 0)
+        ##self.stats.Add(falltimesizer, 0, wx.ALIGN_LEFT, 0)
+        ##self.stats.Add(chargesizer, 0, wx.ALIGN_LEFT, 0)
+
+
         buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         buttonSizer.Add(prev_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
         buttonSizer.Add(next_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
@@ -119,10 +172,12 @@ class MainPanel(wx.Panel):
         fileSizer.Add(self.filename, 0, wx.ALL, 0)
         fileSizer.Add(browser, 0, wx.ALL, 0)
         controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
+        controlSizer.Add(1000,300,0)
+        controlSizer.Add(self.stats, 0, wx.ALL|wx.EXPAND, 0)
         #controlSizer.Add(res_button, 0, wx.ALL, 5)
         self.mainSizer.Add(controlSizer, 1, wx.ALL, 0)
         self.mainSizer.Add(resultSizer, 1, wx.ALL, 5)
-
+        
         # Final Configs...    
         self.SetSizer(self.mainSizer)
         self.mainSizer.Fit(self)
@@ -159,18 +214,24 @@ class MainPanel(wx.Panel):
 # inner one, the inner one will have all the necessary arguments and only be called upon the event...
     def analyze(self, button1, button2):
         def OnClick(event):
-         
+            #Check to see if Analyze Button Has been clicked yet
             if not button1.IsShown():
                 self.plotter = self.parent.apanel
                 self.index = 0
                 self.data = Data()
-                self.data=self.data.set
                 #print(self.parent.apanel.nb.IsShown())
                 button1.Show()
                 button2.Show()
                 self.Layout()
+                #Plot first waveform
                 axes = self.plotter.add('Waveform 1').gca()
-                axes.plot(self.data[0][0], self.data[0][1])
+                axes.plot(self.data.set[0][0], self.data.set[0][1], color = "Black")
+                axes.plot([self.data.risetimes[0], self.data.risetimes[0]], [0, 4], color="Red")
+                axes.plot([self.data.falltimes[0], self.data.falltimes[0]],[0,4], color="Red")
+                self.risetimeval.SetLabel(str(self.data.risetimes[0]))
+                self.peaktimeval.SetLabel(str(self.data.peaktimes[0]))
+                self.falltimeval.SetLabel(str(self.data.falltimes[0]))
+                self.chargeval.SetLabel(str(self.data.charges[0]))
                 self.plotter.Layout()
 
 
@@ -192,13 +253,19 @@ class MainPanel(wx.Panel):
 
 
     def next(self, event):
+        self.index += 1
+        self.risetimeval.SetLabel(str(self.data.risetimes[self.index]))
+        self.peaktimeval.SetLabel(str(self.data.peaktimes[self.index]))
+        self.falltimeval.SetLabel(str(self.data.falltimes[self.index]))
+        self.chargeval.SetLabel(str(self.data.charges[self.index])) 
         #Check to see if current page is last one, if it is then make the next one
         if self.plotter.nb.GetSelection() == self.plotter.nb.GetPageCount() -1:
-            self.index += 1
             axes = self.plotter.add('Waveform {}'.format(self.index + 1)).gca()
-            axes.plot(self.data[self.index][0], self.data[self.index][1])
+            axes.plot(self.data.set[self.index][0], self.data.set[self.index][1])
+            axes.plot([self.data.risetimes[self.index], self.data.risetimes[self.index]], [0, 4], color="Red")
+            axes.plot([self.data.falltimes[self.index], self.data.falltimes[self.index]],[0,4], color="Red")
             self.plotter.nb.AdvanceSelection()
-            print(self.plotter.nb.GetSelection())
+            #print(self.plotter.nb.GetSelection())
             self.Layout()
             self.plotter.Layout()
 
@@ -207,15 +274,25 @@ class MainPanel(wx.Panel):
         return
 
     def previous(self, event):
+        self.index -= 1
         self.plotter.nb.AdvanceSelection(False)
+        self.risetimeval.SetLabel(str(self.data.risetimes[self.index]))
+        self.peaktimeval.SetLabel(str(self.data.peaktimes[self.index]))
+        self.falltimeval.SetLabel(str(self.data.falltimes[self.index]))
+        self.chargeval.SetLabel(str(self.data.charges[self.index]))
+        self.Layout()
+        self.plotter.Layout() 
         return
         
 
 class Data:
     def __init__(self):
         self.set=[[[1,2,3],[2,1,4]],[[1, 2, 3, 4, 5], [2, 1, 4, 2, 3]],[[1, 4, 6, 19], [4, 7, 8, 15]], [[1,3,5,5],[-3,5,-7,10]]]
-    
-
+        self.risetimes = [2,3,4,5]
+        self.peaktimes = [4,7,9,10]
+        self.falltimes = [3,4,1,5]   
+        self.charges = [20,40,50,39]
+       
 
 
 
@@ -228,7 +305,7 @@ class Data:
 
 def main():
     app=MainApp()
-#    wx.lib.inspection.InspectionTool().Show()
+    wx.lib.inspection.InspectionTool().Show()
     app.MainLoop() 
 
 
