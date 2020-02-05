@@ -1,5 +1,8 @@
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 import wx
+import wx.lib.plot.polyobjects as po
 import wx.lib.agw.aui as aui
 import wx.lib.mixins.inspection as wit
 import matplotlib as mpl
@@ -31,8 +34,8 @@ class MainFrame(wx.Frame):
     def InitFrame(self):
         # Make sizer and add panels to sizer to for auto-resizing
         sizer=wx.BoxSizer(wx.HORIZONTAL)
-        self.panel = MainPanel(self, id=wx.ID_ANY, pos=(0,100), size=(100,100))
         self.apanel = PlotNotebook(self, id=-1, pos=(100,100), size=(300,300))
+        self.panel = MainPanel(self, id=wx.ID_ANY, pos=(0,100), size=(100,100))
         sizer.Add(self.panel, 1, wx.EXPAND|wx.ALL, 5)
         sizer.Add(self.apanel, 3, wx.ALIGN_TOP|wx.EXPAND, 0)
         self.SetSizer(sizer)
@@ -42,8 +45,10 @@ class MainFrame(wx.Frame):
 class PlotNotebook(wx.Panel):
     def __init__(self, parent, id, pos, size):
         wx.Panel.__init__(self, parent, id, pos, size)
+        self.parent = parent
         atext = wx.StaticText(self, wx.ID_ANY, "Analysis Side")
         self.nb = aui.AuiNotebook(self)
+        self.Bind(aui.EVT_AUINOTEBOOK_PAGE_CHANGED, self.on_nb_tab_changed, self.nb)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(atext, 0, wx.TOP|wx.CENTER)
         sizer.Add(self.nb, 5, wx.TOP|wx.EXPAND)
@@ -51,10 +56,19 @@ class PlotNotebook(wx.Panel):
 
     def add(self, name="plot"):
         page = Plot(self.nb)
+        page.name=name
         self.nb.AddPage(page, name)
         return page.figure
 
-        
+    def on_nb_tab_changed(self, event):
+        index = int(self.nb.GetCurrentPage().name.split()[1]) - 1
+        mainpanel = self.parent.panel
+        mainpanel.risetimeval.SetLabel(str(mainpanel.data.risetimes[index]))
+        mainpanel.peaktimeval.SetLabel(str(mainpanel.data.peaktimes[index]))
+        mainpanel.falltimeval.SetLabel(str(mainpanel.data.falltimes[index]))
+        mainpanel.chargeval.SetLabel(str(mainpanel.data.charges[index]))
+        mainpanel.plotter.Layout()
+       
 
 
 class Plot(wx.Panel):
@@ -72,62 +86,66 @@ class Plot(wx.Panel):
 
 
 
-
-
-
-
 class MainPanel(wx.Panel):
     
     def __init__(self, parent, id, pos, size):
         super().__init__(parent, id, pos, size)
         #need to add parent attribute so that plotter can call within this class, timing issue here????
-        self.parent = parent
+        self.parent=parent
+        self.plotter = parent.apanel
         self.InitForm()        
         self.currentDirectory = os.getcwd()
         
 
     def InitForm(self):
-
         #Make the Sizers that will always be shown
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
         controlSizer = wx.BoxSizer(wx.VERTICAL)
         resultSizer = wx.BoxSizer(wx.VERTICAL)
-        fileSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        
-        #Make useable things
-        self.filename = wx.StaticText(self, id=wx.ID_ANY, label="No File Currently Selected")
-        browser = wx.Button(self, wx.ID_ANY, 'Browse')
+        #Control Sizer:
+        #Add title
+        ctext = wx.StaticText(self, wx.ID_ANY, "Controller Side")
+        controlSizer.Add(ctext, 0, wx.CENTER|wx.TOP, 0)
+        #Add Analyze Button
+        analyze_button = wx.Button(self, wx.ID_ANY, 'Analyze')
+        controlSizer.Add(analyze_button, 0, wx.ALL, 5)
+        #Add Button Sizer to contain 'Previous' and 'Next' Buttons (Hidden on start up)
+        buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         next_button = wx.Button(self, wx.ID_ANY, 'Next')
         next_button.Hide()
         prev_button = wx.Button(self, wx.ID_ANY, "Previous")
         prev_button.Hide()
-        ctext = wx.StaticText(self, wx.ID_ANY, "Controller Side")
-        analyze_button = wx.Button(self, wx.ID_ANY, 'Analyze')
-        self.Bind(wx.EVT_BUTTON, self.analyze(next_button, prev_button), analyze_button)
         self.Bind(wx.EVT_BUTTON, self.next, next_button)
         self.Bind(wx.EVT_BUTTON, self.previous, prev_button)
+        self.Bind(wx.EVT_BUTTON, self.analyze(next_button, prev_button), analyze_button)
+        buttonSizer.Add(prev_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
+        buttonSizer.Add(next_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
+        controlSizer.Add(buttonSizer, 0, wx.ALL|wx.EXPAND, 0)
+        #Add FileSizer for file input
+        fileSizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.filename = wx.StaticText(self, id=wx.ID_ANY, label="No File Currently Selected")
+        browser = wx.Button(self, wx.ID_ANY, 'Browse')
         self.Bind(wx.EVT_BUTTON, self.onOpenFile, browser)
+        fileSizer.Add(self.filename, 0, wx.ALL, 0)
+        fileSizer.Add(browser, 0, wx.ALL, 0)
+        controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
+        #Create blank sizer for separation between end of filesizer and beginning of statistics(characteristics) sizer
+        controlSizer.Add(1000,300,0)
+        #Add statistics (characteristics) sizer 
         self.stats = wx.BoxSizer(wx.VERTICAL)
         stats = wx.StaticText(self, id=wx.ID_ANY, label = "Statistics")
-        #Create Horizontal Sizers for each characteristic "Key Value Pair"
+        #Create Horizontal Sizers for Key Value Pairs
         charkeyvalsizer = wx.BoxSizer(wx.HORIZONTAL)
+        #Create Key and Value sizers
         keysizer=wx.BoxSizer(wx.VERTICAL)
         valsizer=wx.BoxSizer(wx.VERTICAL)
-       ## risetimesizer=wx.BoxSizer(wx.HORIZONTAL)
-       ## risetimevalsizer=wx.BoxSizer(wx.HORIZONTAL)
-       ## peaktimesizer=wx.BoxSizer(wx.HORIZONTAL)
-       ## peaktimevalsizer=wx.BoxSizer(wxx.HORIZONTAL)
-       ## falltimesizer=wx.BoxSizer(wx.HORIZONTAL)
-       ## falltimevalsizer=wx.BoxSizer(wx.HORIZONTAL)
-       ## chargesizer=wx.BoxSizer(wx.HORIZONTAL)
-       ## chargevalsizer=wx.BoxSizer(wx.HORIZONTAL)
-        #Create Labels for each Characteristic
+        #Create Labels (Keys) for each Characteristic
         risetime = wx.StaticText(self, id=wx.ID_ANY, label = "Rise Time")
         peaktime = wx.StaticText(self, id=wx.ID_ANY, label = "Peak Time")
         falltime = wx.StaticText(self, id=wx.ID_ANY, label = "Fall Time")
         charge = wx.StaticText(self, id=wx.ID_ANY, label = "Charge")
-        #Create blank labels for the actual values to go in  
+        #Create blank labels (Values) for the actual values to go in  
         self.risetimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Rise Val")
         self.peaktimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Peak Val")
         self.falltimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Fall Val")
@@ -141,47 +159,34 @@ class MainPanel(wx.Panel):
         valsizer.Add(self.peaktimeval, 0, wx.ALIGN_LEFT, 0)
         valsizer.Add(self.falltimeval, 0, wx.ALIGN_LEFT, 0)
         valsizer.Add(self.chargeval, 0, wx.ALIGN_LEFT, 0)
+        #Add key and value pairs to charkeyvalsizer
         charkeyvalsizer.Add(keysizer, 0, wx.ALL, 0)
+        #Blank sizer for formatting purposes
         charkeyvalsizer.Add(20,0,0)
         charkeyvalsizer.Add(valsizer, 0, wx.ALL, 0)
- 
-        ##risetimesizer.Add(risetime, 0, wx.EXPAND, 0)
-        ##risetimesizer.Add(self.risetimeval, 0, wx.EXPAND, 0)
-        ##peaktimesizer.Add(peaktime, 0, wx.ALIGN_LEFT, 5)
-        ##peaktimesizer.Add(self.peaktimeval, 0, wx.ALIGN_RIGHT, 5)
-        ##falltimesizer.Add(falltime, 0, wx.ALIGN_LEFT, 5)
-        ##alltimesizer.Add(self.falltimeval, 0, wx.ALIGN_RIGHT, 5)
-        ##chargesizer.Add(charge, 0, wx.ALIGN_LEFT, 5)
-        ##chargesizer.Add(self.chargeval, 0, wx.ALIGN_LEFT, 5)
-        #Add contents to each sizer
-        controlSizer.Add(ctext, 0, wx.CENTER|wx.TOP, 0)
-        controlSizer.Add(analyze_button, 0, wx.ALL, 5)
-        #Add characteristinc labels to stats sizer
+        #Add characteristic labels to stats sizer
         self.stats.Add(stats, 0, wx.ALIGN_CENTER, 0)
         self.stats.Add(charkeyvalsizer, 0, wx.ALIGN_LEFT, 0)
-        ##self.stats.Add(risetimesizer, 0, wx.ALIGN_LEFT, 0)
-        ##self.stats.Add(peaktimesizer, 0, wx.ALIGN_LEFT, 0)
-        ##self.stats.Add(falltimesizer, 0, wx.ALIGN_LEFT, 0)
-        ##self.stats.Add(chargesizer, 0, wx.ALIGN_LEFT, 0)
-
-
-        buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
-        buttonSizer.Add(prev_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        buttonSizer.Add(next_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
-        controlSizer.Add(buttonSizer, 0, wx.ALL|wx.EXPAND, 0)
-        fileSizer.Add(self.filename, 0, wx.ALL, 0)
-        fileSizer.Add(browser, 0, wx.ALL, 0)
-        controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
-        controlSizer.Add(1000,300,0)
+        #Add stats sizer to control sizer
         controlSizer.Add(self.stats, 0, wx.ALL|wx.EXPAND, 0)
-        #controlSizer.Add(res_button, 0, wx.ALL, 5)
+        #Add waveform and charge spectrum buttons
+        spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
+        waveformspec=wx.Button(self, id=wx.ID_ANY, label="Waveforms")
+        self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, waveformspec)
+        chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
+        self.Bind(wx.EVT_BUTTON, self.plotchargespec, chargespec)
+        spectrumsizer.Add(waveformspec, 0, wx.ALL, 0)
+        spectrumsizer.Add(chargespec, 0, wx.ALL, 0)
+        controlSizer.Add(100,100,0)
+        controlSizer.Add(spectrumsizer, 0, wx.ALIGN_CENTER, 0)          
+        #Add sizers to the main sizer (note the result sizer is blank and will be used when a button is clicked)
         self.mainSizer.Add(controlSizer, 1, wx.ALL, 0)
         self.mainSizer.Add(resultSizer, 1, wx.ALL, 5)
-        
         # Final Configs...    
         self.SetSizer(self.mainSizer)
         self.mainSizer.Fit(self)
         self.Layout()
+
 
     def onOpenFile(self, event):
 #            """
@@ -216,7 +221,6 @@ class MainPanel(wx.Panel):
         def OnClick(event):
             #Check to see if Analyze Button Has been clicked yet
             if not button1.IsShown():
-                self.plotter = self.parent.apanel
                 self.index = 0
                 self.data = Data()
                 #print(self.parent.apanel.nb.IsShown())
@@ -225,26 +229,16 @@ class MainPanel(wx.Panel):
                 self.Layout()
                 #Plot first waveform
                 axes = self.plotter.add('Waveform 1').gca()
+                axes.set_title("Voltage vs Time")
+                axes.set_ylabel("Voltage (V)")
+                axes.set_xlabel("Time (ns)")
                 axes.plot(self.data.set[0][0], self.data.set[0][1], color = "Black")
                 axes.plot([self.data.risetimes[0], self.data.risetimes[0]], [0, 4], color="Red")
                 axes.plot([self.data.falltimes[0], self.data.falltimes[0]],[0,4], color="Red")
-                self.risetimeval.SetLabel(str(self.data.risetimes[0]))
-                self.peaktimeval.SetLabel(str(self.data.peaktimes[0]))
-                self.falltimeval.SetLabel(str(self.data.falltimes[0]))
-                self.chargeval.SetLabel(str(self.data.charges[0]))
-                self.plotter.Layout()
-
-
-
-        
-                #self.plotter.nb.DeletePage(1)
-                #self.plotter.Layout()
-
             else:
                 return
         return OnClick
 
-    
 
     def add(self, name="plot"):
         page = Plot(self.nb)
@@ -253,8 +247,11 @@ class MainPanel(wx.Panel):
 
 
     def next(self, event):
-        self.index += 1
-        self.risetimeval.SetLabel(str(self.data.risetimes[self.index]))
+        try:
+            self.risetimeval.SetLabel(str(self.data.risetimes[self.index + 1]))
+            self.index += 1
+        except IndexError:
+            return
         self.peaktimeval.SetLabel(str(self.data.peaktimes[self.index]))
         self.falltimeval.SetLabel(str(self.data.falltimes[self.index]))
         self.chargeval.SetLabel(str(self.data.charges[self.index])) 
@@ -264,8 +261,10 @@ class MainPanel(wx.Panel):
             axes.plot(self.data.set[self.index][0], self.data.set[self.index][1])
             axes.plot([self.data.risetimes[self.index], self.data.risetimes[self.index]], [0, 4], color="Red")
             axes.plot([self.data.falltimes[self.index], self.data.falltimes[self.index]],[0,4], color="Red")
+            axes.set_title("Voltage vs Time")
+            axes.set_ylabel("Voltage (V)")
+            axes.set_xlabel("Time (ns)")
             self.plotter.nb.AdvanceSelection()
-            #print(self.plotter.nb.GetSelection())
             self.Layout()
             self.plotter.Layout()
 
@@ -274,25 +273,44 @@ class MainPanel(wx.Panel):
         return
 
     def previous(self, event):
-        self.index -= 1
-        self.plotter.nb.AdvanceSelection(False)
-        self.risetimeval.SetLabel(str(self.data.risetimes[self.index]))
-        self.peaktimeval.SetLabel(str(self.data.peaktimes[self.index]))
-        self.falltimeval.SetLabel(str(self.data.falltimes[self.index]))
-        self.chargeval.SetLabel(str(self.data.charges[self.index]))
-        self.Layout()
-        self.plotter.Layout() 
+        if self.index == 0:
+            return
+        else:
+            self.index -= 1
+            self.plotter.nb.AdvanceSelection(False)
+            return
+
+## Use with threading, except CPU will be eaten up
+#    def setstats(self):
+#        while True:
+#                continue
+     
+    def plotwaveformspec(self, event):
+
+        plt.hist(self.data.waveforms, 50, density=True, facecolor="g", alpha=0.75)
+        plt.xlabel('Amplitude')
+        plt.ylabel('Number of Events')
+        plt.title('Frequency vs. Amplitude')
+        plt.xlim(0, 20)
+        plt.ylim(0, 10)
+        plt.grid(True)
+        plt.show()
+                                   
         return
-        
+
+    def plotchargespec(self, event):
+        return
+
+
 
 class Data:
     def __init__(self):
         self.set=[[[1,2,3],[2,1,4]],[[1, 2, 3, 4, 5], [2, 1, 4, 2, 3]],[[1, 4, 6, 19], [4, 7, 8, 15]], [[1,3,5,5],[-3,5,-7,10]]]
         self.risetimes = [2,3,4,5]
         self.peaktimes = [4,7,9,10]
-        self.falltimes = [3,4,1,5]   
-        self.charges = [20,40,50,39]
-       
+        self.falltimes = [3,4,1,5] 
+        self.charges = [20, 45, 14, 40]  
+        self.waveforms = np.array([15,16,17,18,14,15,15,15,16,10,18,15])       
 
 
 
