@@ -207,8 +207,6 @@ class MainPanel(wx.Panel):
             paths = paths[0].split("/")
             f = paths[-1]
             self.filename.SetLabel(f)
-            f = open(f, "r")
-            print(f.read())
         dlg.Destroy()
  
 
@@ -222,7 +220,8 @@ class MainPanel(wx.Panel):
             #Check to see if Analyze Button Has been clicked yet
             if not button1.IsShown():
                 self.index = 0
-                self.data = Data()
+                f = self.filename.GetLabel()
+                self.data = Data(f)
                 #print(self.parent.apanel.nb.IsShown())
                 button1.Show()
                 button2.Show()
@@ -305,7 +304,7 @@ class MainPanel(wx.Panel):
 
 
 class Data:
-    def __init__(self, f = "Trial 21.dat"):
+    def __init__(self, f):
         data = read_data(f)
         self.events=data.events
 
