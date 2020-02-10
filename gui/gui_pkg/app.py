@@ -98,6 +98,7 @@ class MainPanel(wx.Panel):
         
 
     def InitForm(self):
+        self.oldfile = ""
         #Make the Sizers that will always be shown
         self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
         controlSizer = wx.BoxSizer(wx.VERTICAL)
@@ -217,10 +218,13 @@ class MainPanel(wx.Panel):
 # inner one, the inner one will have all the necessary arguments and only be called upon the event...
     def analyze(self, button1, button2):
         def OnClick(event):
+            f = self.filename.GetLabel()
             #Check to see if Analyze Button Has been clicked yet
-            if not button1.IsShown():
+            if f != "No File Currently Selected" and f != self.oldfile:
+                self.oldfile = f
+                while(self.plotter.nb.GetPageCount()):
+                    self.plotter.nb.DeletePage(0)
                 self.index = 0
-                f = self.filename.GetLabel()
                 self.data = Data(f)
                 #print(self.parent.apanel.nb.IsShown())
                 button1.Show()
@@ -231,9 +235,9 @@ class MainPanel(wx.Panel):
                 axes.set_title("Voltage vs Time")
                 axes.set_ylabel("Voltage (V)")
                 axes.set_xlabel("Time (ns)")
-                axes.plot(self.data.set[0][0], self.data.set[0][1], color = "Black")
-                axes.plot([self.data.risetimes[0], self.data.risetimes[0]], [0, 4], color="Red")
-                axes.plot([self.data.falltimes[0], self.data.falltimes[0]],[0,4], color="Red")
+                axes.plot(self.data.events[0].event[0][1], self.data.events[0].event[0][0], color = "Black")
+                #axes.plot([self.data.risetimes[0], self.data.risetimes[0]], [0, 4], color="Red")
+                #axes.plot([self.data.falltimes[0], self.data.falltimes[0]],[0,4], color="Red")
             else:
                 return
         return OnClick
@@ -246,14 +250,9 @@ class MainPanel(wx.Panel):
 
 
     def next(self, event):
-        try:
-           # self.risetimeval.SetLabel(str(self.data.risetimes[self.index + 1]))
-            self.index += 1
-        except IndexError:
-            return
-        #self.peaktimeval.SetLabel(str(self.data.peaktimes[self.index]))
-        #self.falltimeval.SetLabel(str(self.data.falltimes[self.index]))
-        #self.chargeval.SetLabel(str(self.data.charges[self.index])) 
+      
+        self.index += 1
+      
         #Check to see if current page is last one, if it is then make the next one
         if self.plotter.nb.GetSelection() == self.plotter.nb.GetPageCount() -1:
             axes = self.plotter.add('Waveform {}'.format(self.index + 1)).gca()
@@ -295,10 +294,10 @@ class MainPanel(wx.Panel):
         plt.ylim(0, 10)
         plt.grid(True)
         plt.show()
-                                   
         return
 
     def plotchargespec(self, event):
+        print("Hello World")
         return
 
 
@@ -307,9 +306,6 @@ class Data:
     def __init__(self, f):
         data = read_data(f)
         self.events=data.events
-
-
-
         self.set=[[[1,2,3],[2,1,4]],[[1, 2, 3, 4, 5], [2, 1, 4, 2, 3]],[[1, 4, 6, 19], [4, 7, 8, 15]], [[1,3,5,5],[-3,5,-7,10]]]
         self.risetimes = [2,3,4,5]
         self.peaktimes = [4,7,9,10]
