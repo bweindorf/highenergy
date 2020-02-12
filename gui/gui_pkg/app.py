@@ -226,6 +226,7 @@ class MainPanel(wx.Panel):
                     self.plotter.nb.DeletePage(0)
                 self.index = 0
                 self.data = Data(f)
+                self.requested_channels = ["1", "3"]
                 #print(self.parent.apanel.nb.IsShown())
                 button1.Show()
                 button2.Show()
@@ -235,7 +236,12 @@ class MainPanel(wx.Panel):
                 axes.set_title("Voltage vs Time")
                 axes.set_ylabel("Voltage (V)")
                 axes.set_xlabel("Time (ns)")
-                axes.plot(self.data.events[0].event[0][1], self.data.events[0].event[0][0], color = "Black")
+                colors = ["Black", "Blue"]
+                i = 0
+                for chn in self.requested_channels:
+                    graph = axes.plot(self.data.events[0].event[int(self.data.channelassignment[chn])][1], self.data.events[0].event[int(self.data.channelassignment[chn])][0], label = ("Channel %s" % chn), color = colors[i])
+                    i += 1
+                axes.legend()
                 #axes.plot([self.data.risetimes[0], self.data.risetimes[0]], [0, 4], color="Red")
                 #axes.plot([self.data.falltimes[0], self.data.falltimes[0]],[0,4], color="Red")
             else:
@@ -256,7 +262,9 @@ class MainPanel(wx.Panel):
         #Check to see if current page is last one, if it is then make the next one
         if self.plotter.nb.GetSelection() == self.plotter.nb.GetPageCount() -1:
             axes = self.plotter.add('Waveform {}'.format(self.index + 1)).gca()
-            axes.plot(self.data.events[self.index + 2].event[0][1], self.data.events[self.index + 2].event[0][0]) #It appears that every other "event" is blank... why?!?!?
+            for chn in self.requested_channels:
+                    axes.plot(self.data.events[self.index].event[int(self.data.channelassignment[chn])][1], self.data.events[self.index].event[int(self.data.channelassignment[chn])][0], color = "Black")
+            #axes.plot(self.data.events[self.index + 2].event[0][1], self.data.events[self.index + 2].event[0][0]) #It appears that every other "event" is blank... why?!?!?
            # axes.plot([self.data.risetimes[self.index], self.data.risetimes[self.index]], [0, 4], color="Red")
            # axes.plot([self.data.falltimes[self.index], self.data.falltimes[self.index]],[0,4], color="Red")
             print(self.data.events[self.index + 1].event[0][0])
@@ -305,7 +313,19 @@ class MainPanel(wx.Panel):
 class Data:
     def __init__(self, f):
         data = read_data(f)
+        self.channelassignment = {}
+        self.loadedchannels = [1, 3]
         self.events=data.events
+        
+        for i in range(len(self.loadedchannels)):
+            self.channelassignment[str(self.loadedchannels[i])] = str(i)
+
+
+
+
+
+
+
         self.set=[[[1,2,3],[2,1,4]],[[1, 2, 3, 4, 5], [2, 1, 4, 2, 3]],[[1, 4, 6, 19], [4, 7, 8, 15]], [[1,3,5,5],[-3,5,-7,10]]]
         self.risetimes = [2,3,4,5]
         self.peaktimes = [4,7,9,10]

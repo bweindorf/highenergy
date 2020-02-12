@@ -109,13 +109,15 @@ def read_data(input_filename):
     info_string = "Reading in events measurend with {0} channels on {1} board(s)..."
     print(info_string.format(n_ch, n_boards))
 
+    event_class = None
+
     while True:
         # Start of Event
         if is_new_event:
             event_serial[0] = unpack("I", f.read(4))[0]
             # print("Event : ", event_serial[0])
             is_new_event = False
-
+            event_class = DrsoscEvent()
             # Set the timestamp, where the milliseconds need to be converted to
             # nanoseconds to fit the function arguments
             dt_list = unpack("H"*8, f.read(16))
@@ -179,7 +181,6 @@ def read_data(input_filename):
             
             NOTE: the channels 0-3 are for the first board and channels 4-7 are for the second board
             """
-            event_class = DrsoscEvent()
             for i, x in enumerate(voltage_ints):
                 event_class.event[chn_i-1][0][i] = ((x / 65535.) - 0.5)
                 event_class.event[chn_i-1][1][i] = t[i]
@@ -194,5 +195,5 @@ def read_data(input_filename):
     # Clean up
     f.close()
 
-    return event_stream   
+    return event_stream  
 
