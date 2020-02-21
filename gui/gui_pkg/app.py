@@ -11,7 +11,7 @@ from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as Navigat
 #import wx.lib.agw.multidirdialog as MDD
 import wx.lib.inspection
 from read_data import read_data
-
+import pandas as pd
 class MainApp(wx.App):
     
     def __init__(self):
@@ -134,12 +134,14 @@ class MainPanel(wx.Panel):
         controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
         #Create Sizer for Channel Selectors
         dataselectorSizer=wx.BoxSizer(wx.HORIZONTAL)
-        board1text = wx.StaticText(self, wx.ID_ANY, "Board 1")
-        board2text = wx.StaticText(self, wx.ID_ANY, "Board 2")
+        self.board1text = wx.StaticText(self, wx.ID_ANY, "Board 1")
+        self.board2text = wx.StaticText(self, wx.ID_ANY, "Board 2")
         board1Sizer = wx.BoxSizer(wx.VERTICAL)
         board2Sizer = wx.BoxSizer(wx.VERTICAL)
-        board1Sizer.Add(board1text, 0, wx.ALL|wx.ALIGN_LEFT, 0)
-        board2Sizer.Add(board2text, 0, wx.ALL|wx.ALIGN_LEFT, 0)
+        board1Sizer.Add(self.board1text, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        board2Sizer.Add(self.board2text, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.board1text.Hide()
+        self.board2text.Hide()
         self.channel11 = wx.CheckBox(self, id=wx.ID_ANY, label = "Channel 1")
         self.channel12 = wx.CheckBox(self, id=wx.ID_ANY, label = "Channel 2")
         self.channel13 = wx.CheckBox(self, id=wx.ID_ANY, label = "Channel 3")
@@ -163,9 +165,8 @@ class MainPanel(wx.Panel):
         board2Sizer.Add(self.channel24, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         dataselectorSizer.Add(board1Sizer, 0, wx.ALL|wx.ALIGN_LEFT, 0)
         dataselectorSizer.Add(board2Sizer, 0, wx.ALL|wx.ALIGN_CENTER, 0)
-#        dataselectorSizer.Add(0, 20, 0)
         controlSizer.Add(dataselectorSizer, 0, wx.ALL|wx.ALIGN_CENTER, 0)
-        self.graphbutton = wx.Button(self, wx.ID_ANY, "Graph")
+        self.graphbutton = wx.Button(self, wx.ID_ANY, "Plot")
         self.Bind(wx.EVT_BUTTON, self.graphdata, self.graphbutton)
         self.changechannelbutton = wx.Button(self, wx.ID_ANY, "Reconfigure Channels")
         self.Bind(wx.EVT_BUTTON, self.changechannel, self.changechannelbutton)
@@ -217,13 +218,15 @@ class MainPanel(wx.Panel):
         controlSizer.Add(self.stats, 0, wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         #Add amplitude (waveform) and charge spectrum buttons
         spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
-        waveformspec=wx.Button(self, id=wx.ID_ANY, label="Amplitudes")
-        self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, waveformspec)
-        chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
-        self.Bind(wx.EVT_BUTTON, self.plotchargespec, chargespec)
-        spectrumsizer.Add(waveformspec, 0, wx.ALL, 0)
-        spectrumsizer.Add(chargespec, 0, wx.ALL, 0)
-        controlSizer.Add(100,100,0)
+        self.waveformspec=wx.Button(self, id=wx.ID_ANY, label="Amplitudes")
+        self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, self.waveformspec)
+        self.chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
+        self.Bind(wx.EVT_BUTTON, self.plotchargespec, self.chargespec)
+        spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.waveformspec.Hide()
+        self.chargespec.Hide()
+        controlSizer.Add(100,50,0)
         controlSizer.Add(spectrumsizer, 0, wx.ALIGN_CENTER, 0)          
         #Add sizers to the main sizer (note the result sizer is blank and will be used when a button is clicked)
         self.mainSizer.Add(controlSizer, 1, wx.ALL, 0)
@@ -261,11 +264,13 @@ class MainPanel(wx.Panel):
 # will carry the actual arguments while inner one will carry only the event, since the outerfunction returns the
 # inner one, the inner one will have all the necessary arguments and only be called upon the event...
     def analyze(self, event):
-        self.changechannelbutton.Hide()
         f = self.fname
         #Check to see if Analyze Button Has been clicked yet
         if f != "No File Currently Selected" and f != self.oldfile:
             self.oldfile = f
+            self.changechannelbutton.Hide()
+            self.waveformspec.Show()
+            self.chargespec.Show()
             for board in self.channelmatrix:
                 for channel in board:
                     channel.SetValue(False)
@@ -285,6 +290,12 @@ class MainPanel(wx.Panel):
         self.graphbutton.Show()
         availableboards = self.data.numboards
         availablechannels = self.data.loadedchannels
+        if len(availablechannels[0]) > 0:
+            self.board1text.Show()
+
+        if len(availablechannels[1]) > 0:
+            self.board2text.Show()
+          
         for board in availablechannels:
             for channel in board:
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
@@ -327,11 +338,11 @@ class MainPanel(wx.Panel):
                 self.next_button.Show()
                 self.prev_button.Show()
                 self.Layout()
-                axes = self.plotter.add('Waveform 1').gca()
+                axes = self.plotter.add('Event 1').gca()
                 axes.set_title("Voltage vs Time")
                 axes.set_ylabel("Voltage (V)")
                 axes.set_xlabel("Time (ns)")
-                colors = ["Black", "Blue"]
+                colors = ["Black", "Blue", "Green"]
                 axes.grid(True)
                 i = 0
                 self.graphbutton.Hide()
@@ -341,7 +352,10 @@ class MainPanel(wx.Panel):
                         channel.Disable()
                         if channel.IsChecked():
                            #if self.channelmatrix.index(board) == 1: add 4 everywhere...
-                            graph = axes.plot(self.data.events[0].event[board.index(channel)][1], self.data.events[0].event[board.index(channel)][0], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
+                            plt = self.data.events[0].channel_data[board.index(channel)]
+                 
+                            axes.plot(plt, label="Channel " + str(self.data.events[0].channel_index[board.index(channel)]), color = colors[i])
+                            #graph = axes.plot(self.data.events[0].channel_data[board.index(channel)][0], self.data.events[0].channel_data[board.index(channel)][1], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
                             i += 1
                         else:
                             continue
@@ -368,15 +382,19 @@ class MainPanel(wx.Panel):
       
         #Check to see if current page is last one, if it is then make the next one
         if self.plotter.nb.GetSelection() == self.plotter.nb.GetPageCount() -1:
-            axes = self.plotter.add('Waveform {}'.format(self.index + 1)).gca()
-            colors = ["Black", "Blue"]
+            axes = self.plotter.add('Event {}'.format(self.index + 1)).gca()
+            colors = ["Black", "Blue", "Green"]
             i = 0
             for board in self.channelmatrix:
                 for channel in board:
                     if channel.IsChecked():
                         #This will only be used if one channel is checked (it will be defined nonetheless)
                         #self.channel = NEED TO KNOW HOW STATS ARE BEING PASSED
-                        graph = axes.plot(self.data.events[self.index].event[board.index(channel)][1], self.data.events[self.index].event[board.index(channel)][0], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
+                       
+                        plt = self.data.events[self.index].channel_data[board.index(channel)]
+                 
+                        axes.plot(plt, label="Channel " + str(self.data.events[self.index].channel_index[board.index(channel)]), color = colors[i])
+                        #graph = axes.plot(self.data.events[self.index].event[board.index(channel)][1], self.data.events[self.index].event[board.index(channel)][0], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
                         i += 1
                     else:
                         continue
@@ -386,7 +404,7 @@ class MainPanel(wx.Panel):
             #axes.plot(self.data.events[self.index + 2].event[0][1], self.data.events[self.index + 2].event[0][0]) #It appears that every other "event" is blank... why?!?!?
            # axes.plot([self.data.risetimes[self.index], self.data.risetimes[self.index]], [0, 4], color="Red")
            # axes.plot([self.data.falltimes[self.index], self.data.falltimes[self.index]],[0,4], color="Red")
-            print(self.data.events[self.index + 1].event[0][0])
+           # print(self.data.events[self.index + 1].event[0][0])
             axes.set_title("Voltage vs Time")
             axes.set_ylabel("Voltage (V)")
             axes.set_xlabel("Time (ns)")
@@ -435,7 +453,7 @@ class Data:
         data = read_data(f)
         self.channelassignment = {}
         self.numboards = 2
-        self.loadedchannels = [[1, 2], []]
+        self.loadedchannels = [[1,2,3], []]
         self.events=data.events
         
         for i in range(len(self.loadedchannels)):

@@ -1,11 +1,14 @@
 from sys import exit
 #from ROOT import TFile, TTree, TTimeStamp, AddressOf
 #from ROOT.std import vector
+import numpy as np
 from numpy import array, uint32, cumsum, roll, zeros, float32, arange
 from struct import unpack
 from event_classes import DrsoscEventStream, DrsoscEvent
+import time
 
 def read_data(input_filename):
+    start_time = time.perf_counter()
     """
     Script to convert binary format to root for DRS4 evaluation boards.
     http://www.psi.ch/drs/evaluation-board
@@ -109,15 +112,17 @@ def read_data(input_filename):
     info_string = "Reading in events measurend with {0} channels on {1} board(s)..."
     print(info_string.format(n_ch, n_boards))
 
-    event_class = None
-
+    current_event = None
     while True:
         # Start of Event
         if is_new_event:
             event_serial[0] = unpack("I", f.read(4))[0]
             # print("Event : ", event_serial[0])
             is_new_event = False
-            event_class = DrsoscEvent()
+            if current_event != None:
+                current_event.complete()
+                event_stream.events.append(current_event)
+            current_event = DrsoscEvent()
             # Set the timestamp, where the milliseconds need to be converted to
             # nanoseconds to fit the function arguments
             dt_list = unpack("H"*8, f.read(16))
@@ -128,7 +133,7 @@ def read_data(input_filename):
             fluff = f.read(4)
             tcell = unpack('H', f.read(4)[2:])[0]
             # Reset current board number
-            current_board = 0
+            current_board = 0 
             continue
 
         # Read the header, this is either
@@ -181,19 +186,24 @@ def read_data(input_filename):
             
             NOTE: the channels 0-3 are for the first board and channels 4-7 are for the second board
             """
-            for i, x in enumerate(voltage_ints):
-                event_class.event[chn_i-1][0][i] = ((x / 65535.) - 0.5)
-                event_class.event[chn_i-1][1][i] = t[i]
-            event_stream.events.append(event_class)
+            wave = (np.array(voltage_ints)/ 65535.) - 0.5
+            t_arr = np.array(t)[:len(wave)]
+            # wave = [None] * len(voltage_ints)
+            # t_arr = [None] * len(voltage_ints)
+            # for i, x in enumerate(voltage_ints):
+            #     wave[i] = ((x / 65535.) - 0.5)
+            #     t_arr[i] = t[i]
+            current_event.add_channel(chn_i, t_arr, wave)
             # print('Channel', chn_i, 'min = ', channels_v[chn_i-1].min())
 
         # End of File
         elif header == b"":
+            event_stream.events.append(current_event)
             #outtree.Fill()
             break
     
     # Clean up
     f.close()
-
-    return event_stream  
+    print("Took ", time.perf_counter() - start_time)
+    return event_stream   
 
