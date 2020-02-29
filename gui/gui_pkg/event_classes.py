@@ -1,49 +1,42 @@
 from struct import unpack
 import numpy as np
+import pandas as pd
+from stats import calc_stats_single_channel
 
 
 class DrsoscEventStream(object):
     def __init__(self):
         self.events = []
-    # def __array__(self):
-    #     return self.events
-
+        self.stats = {}
+    
     @staticmethod
     def new_event():
         return DrsoscEvent()
 
+    def complete(self):
+        self.events = pd.Series(self.events)
 
-    # @property
-    # def trigger_cell(self):
-    #     if(not self.board):
-    #         raise Exception("Board not set")
-    #     if(not self.board.trigger_cell):
-    #         raise Exception("Trigger cell not set")
-    #     return self.board.trigger_cell
+    def channel(self, chn_i):
+        return self.events.map(lambda event: event[chn_i])
 
-    # @property
-    # def timebins(self):
-    #     return self._timebins
-
-    # @timebins.setter
-    # def timebins(self, value):
-    #     return list(roll(timebins[chn_i-1], -tcell))+list(roll(timebins[chn_i-1], -tcell))
-
-    def __repr__(self):
-        return """
-Event Stream:
- - Board: {}
- - Channel: {}
- - Events: {}
- - Timebins: {}
-""".format(self.board, self.channel_id, self.events, self.timebins)
+    def calc_stats(self):
+        self.stats['single_channel'] = calc_stats_single_channel(self.events)
+        return self.stats
 
 class DrsoscEvent(object):
     def __init__(self): # , event_id, event_time):
         # self.event_id = event_id
         # self.event_time = event_time
         self.boards = []
-        self.event = np.zeros((16, 2, 1024), dtype=np.float32) # (channel, (time or waveform), bin)
+        self.event = None
+        self.channel_index = []
+        self.channel_data = []
+        
+    def add_channel(self, chn_i, time, wave):
+        self.channel_index.append(chn_i)
+        self.channel_data.append(pd.Series(wave, time))
+    def complete(self):
+        return pd.Series(self.channel_data, self.channel_index)
 
 
 class DrsoscBoard(object):
@@ -56,7 +49,7 @@ class DrsoscBoard(object):
 
     @trigger_cell.setter
     def trigger_cell(self, value):
-        self._trigger_cell = value;
+        self._trigger_cell = value
 
     def __eq__(self, other):
         return self.board_id == other.board_id

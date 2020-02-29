@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gui_pkg-bweindorf",
-    version="0.0.4",
+    version="0.5.1",
     author="Brandon Weindorf",
     author_email="bjweindorf@gmail.com",
     description="Gui For High Energy Data Analysis",

@@ -120,8 +120,7 @@ def read_data(input_filename):
             # print("Event : ", event_serial[0])
             is_new_event = False
             if current_event != None:
-                current_event.complete()
-                event_stream.events.append(current_event)
+                event_stream.events.append(current_event.complete())
             current_event = DrsoscEvent()
             # Set the timestamp, where the milliseconds need to be converted to
             # nanoseconds to fit the function arguments
@@ -188,22 +187,18 @@ def read_data(input_filename):
             """
             wave = (np.array(voltage_ints)/ 65535.) - 0.5
             t_arr = np.array(t)[:len(wave)]
-            # wave = [None] * len(voltage_ints)
-            # t_arr = [None] * len(voltage_ints)
-            # for i, x in enumerate(voltage_ints):
-            #     wave[i] = ((x / 65535.) - 0.5)
-            #     t_arr[i] = t[i]
-            current_event.add_channel(chn_i, t_arr, wave)
+            current_event.add_channel(chn_i -1, t_arr, wave)
             # print('Channel', chn_i, 'min = ', channels_v[chn_i-1].min())
 
         # End of File
         elif header == b"":
-            event_stream.events.append(current_event)
+            event_stream.events.append(current_event.complete())
             #outtree.Fill()
             break
     
     # Clean up
     f.close()
+    event_stream.complete()
     print("Took ", time.perf_counter() - start_time)
     return event_stream   
 

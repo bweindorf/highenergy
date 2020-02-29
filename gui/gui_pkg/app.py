@@ -124,13 +124,13 @@ class MainPanel(wx.Panel):
         buttonSizer.Add(self.next_button, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 5)
         controlSizer.Add(buttonSizer, 0, wx.ALL|wx.EXPAND, 0)
         #Add FileSizer for file input
-        fileSizer = wx.BoxSizer(wx.HORIZONTAL)
+        fileSizer = wx.BoxSizer(wx.VERTICAL)
         self.filename = wx.StaticText(self, id=wx.ID_ANY, label="No File Currently Selected")
         browser = wx.Button(self, wx.ID_ANY, 'Browse')
         self.fname = "No File Currently Selected"
         self.Bind(wx.EVT_BUTTON, self.onOpenFile, browser)
         fileSizer.Add(self.filename, 0, wx.ALL, 0)
-        fileSizer.Add(browser, 0, wx.ALL, 0)
+        fileSizer.Add(browser, 0, wx.ALL|wx.CENTER, 0)
         controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
         #Create Sizer for Channel Selectors
         dataselectorSizer=wx.BoxSizer(wx.HORIZONTAL)
@@ -352,9 +352,10 @@ class MainPanel(wx.Panel):
                         channel.Disable()
                         if channel.IsChecked():
                            #if self.channelmatrix.index(board) == 1: add 4 everywhere...
-                            plt = self.data.events[0].channel_data[board.index(channel)]
+                            #self.data.events[event_number][channel]
+                            plt = self.data.events[0][board.index(channel)]
                  
-                            axes.plot(plt, label="Channel " + str(self.data.events[0].channel_index[board.index(channel)]), color = colors[i])
+                            axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
                             #graph = axes.plot(self.data.events[0].channel_data[board.index(channel)][0], self.data.events[0].channel_data[board.index(channel)][1], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
                             i += 1
                         else:
@@ -391,9 +392,9 @@ class MainPanel(wx.Panel):
                         #This will only be used if one channel is checked (it will be defined nonetheless)
                         #self.channel = NEED TO KNOW HOW STATS ARE BEING PASSED
                        
-                        plt = self.data.events[self.index].channel_data[board.index(channel)]
+                        plt = self.data.events[self.index][board.index(channel)]
                  
-                        axes.plot(plt, label="Channel " + str(self.data.events[self.index].channel_index[board.index(channel)]), color = colors[i])
+                        axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
                         #graph = axes.plot(self.data.events[self.index].event[board.index(channel)][1], self.data.events[self.index].event[board.index(channel)][0], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
                         i += 1
                     else:
@@ -453,8 +454,17 @@ class Data:
         data = read_data(f)
         self.channelassignment = {}
         self.numboards = 2
-        self.loadedchannels = [[1,2,3], []]
+        self.loadedchannels = [[], []]
         self.events=data.events
+        for i in range(8):
+            try:
+                self.events[0][i]
+                if i < 4:
+                    self.loadedchannels[0].append(i + 1)
+                else:
+                    self.loadedchannels[1].append(i+1)
+            except KeyError:
+                continue
         
         for i in range(len(self.loadedchannels)):
             self.channelassignment[str(self.loadedchannels[i])] = str(i)
@@ -482,7 +492,7 @@ class Data:
 
 def main():
     app=MainApp()
-    wx.lib.inspection.InspectionTool().Show()
+   # wx.lib.inspection.InspectionTool().Show()
     app.MainLoop() 
 
 
