@@ -12,6 +12,7 @@ from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as Navigat
 import wx.lib.inspection
 from read_data import read_data
 import pandas as pd
+
 class MainApp(wx.App):
     
     def __init__(self):
@@ -127,8 +128,8 @@ class MainPanel(wx.Panel):
         fileSizer = wx.BoxSizer(wx.VERTICAL)
         self.filename = wx.StaticText(self, id=wx.ID_ANY, label="No File Currently Selected")
         browser = wx.Button(self, wx.ID_ANY, 'Browse')
+        browser.Bind(wx.EVT_BUTTON, self.onOpenFile)
         self.fname = "No File Currently Selected"
-        self.Bind(wx.EVT_BUTTON, self.onOpenFile, browser)
         fileSizer.Add(self.filename, 0, wx.ALL, 0)
         fileSizer.Add(browser, 0, wx.ALL|wx.CENTER, 0)
         controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
@@ -170,11 +171,23 @@ class MainPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.graphdata, self.graphbutton)
         self.changechannelbutton = wx.Button(self, wx.ID_ANY, "Reconfigure Channels")
         self.Bind(wx.EVT_BUTTON, self.changechannel, self.changechannelbutton)
+        self.gototext = wx.StaticText(self, wx.ID_ANY, "Go To Event #: ")
+        self.goto = wx.SpinCtrl(self, wx.ID_ANY)
+        self.gotobutton = wx.Button(self, wx.ID_ANY, "GO!")
+        self.Bind(wx.EVT_BUTTON, self.gotoevent, self.gotobutton)
+        self.gotosizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.gotosizer.Add(self.gototext, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.gotosizer.Add(self.goto, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.gotosizer.Add(self.gotobutton, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         graphSizer = wx.BoxSizer(wx.VERTICAL)
         graphSizer.Add(self.graphbutton, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,0)
         graphSizer.Add(self.changechannelbutton, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,0)
+        graphSizer.Add(self.gotosizer, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,0)
         self.graphbutton.Hide()
         self.changechannelbutton.Hide()
+        self.gototext.Hide()
+        self.goto.Hide()
+        self.gotobutton.Hide()
         controlSizer.Add(graphSizer, 0, wx.ALL|wx.ALIGN_CENTER, 0)        
         #Create blank sizer for separation between end of filesizer and beginning of statistics(characteristics) sizer
         controlSizer.Add(1000,300,0)
@@ -219,10 +232,10 @@ class MainPanel(wx.Panel):
         #Add amplitude (waveform) and charge spectrum buttons
         spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
         self.waveformspec=wx.Button(self, id=wx.ID_ANY, label="Amplitudes")
-        self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, self.waveformspec)
         self.chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
         self.Bind(wx.EVT_BUTTON, self.plotchargespec, self.chargespec)
         spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, self.waveformspec)
         spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.waveformspec.Hide()
         self.chargespec.Hide()
@@ -241,8 +254,9 @@ class MainPanel(wx.Panel):
 #            """
 #           Create and show the Open FileDialog
 #          """
+        print("File Browser Now Open")
         dlg = wx.FileDialog(
-        self, message="Choose a file",
+        self, message="Choose a file Test Message",
         defaultDir=self.currentDirectory, 
         defaultFile="",
         wildcard="dat files (*.dat)|*.dat",
@@ -256,7 +270,8 @@ class MainPanel(wx.Panel):
             self.filename.SetLabel(dname)
             self.fname = name
         dlg.Destroy()
- 
+        print("File Browser Destoyed")
+        return 
 
 # Note about syntax, usually you Bind functions by calling them by name (myFunc as opposed to
 # myFunc() which would cause the function to execute immediately upon binding. If you want to bind a function
@@ -269,6 +284,9 @@ class MainPanel(wx.Panel):
         if f != "No File Currently Selected" and f != self.oldfile:
             self.oldfile = f
             self.changechannelbutton.Hide()
+            self.gototext.Hide()
+            self.goto.Hide()
+            self.gotobutton.Hide()
             self.waveformspec.Show()
             self.chargespec.Show()
             for board in self.channelmatrix:
@@ -280,6 +298,9 @@ class MainPanel(wx.Panel):
                 self.plotter.nb.DeletePage(0)
 
             self.data = Data(f)
+            self.goto.SetMin(1)
+            self.goto.SetMax(len(self.data.events))
+            self.goto.SetValue(1)
             self.showchannels()
         else:
             return
@@ -288,7 +309,7 @@ class MainPanel(wx.Panel):
     def showchannels(self):
         #Iterate through the channels, and display the ones that read_data has available
         self.graphbutton.Show()
-        availableboards = self.data.numboards
+        #availableboards = self.data.numboards
         availablechannels = self.data.loadedchannels
         if len(availablechannels[0]) > 0:
             self.board1text.Show()
@@ -307,6 +328,9 @@ class MainPanel(wx.Panel):
         self.next_button.Hide()
         self.graphbutton.Show()
         self.changechannelbutton.Hide()
+        self.gototext.Hide()
+        self.goto.Hide()
+        self.gotobutton.Hide()
         availableboards = self.data.numboards
         availablechannels = self.data.loadedchannels
         for board in availablechannels:
@@ -347,6 +371,9 @@ class MainPanel(wx.Panel):
                 i = 0
                 self.graphbutton.Hide()
                 self.changechannelbutton.Show()
+                self.gototext.Show()
+                self.goto.Show()
+                self.gotobutton.Show()
                 for board in self.channelmatrix:
                     for channel in board:
                         channel.Disable()
@@ -430,9 +457,37 @@ class MainPanel(wx.Panel):
 #    def setstats(self):
 #        while True:
 #                continue
+
+
+    def gotoevent(self, event):
+        eventnum = self.goto.GetValue() - 1
+        if eventnum < self.plotter.nb.GetPageCount():
+            print("Error, please select event that has not already been displayed")
+        else:
+            axes = self.plotter.add('Event {}'.format(eventnum + 1)).gca()
+            colors = ["Black", "Blue", "Green"]
+            i = 0
+            for board in self.channelmatrix:
+                for channel in board:
+                    if channel.IsChecked():
+                    
+                        plt = self.data.events[eventnum][board.index(channel)]
+                        axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
+                        i += 1
+                    else:
+                        continue
+            axes.set_title("Voltage vs Time")
+            axes.set_ylabel("Voltage (V)")
+            axes.set_xlabel("Time (ns)")
+            axes.legend()
+            self.plotter.nb.AdvanceSelection()
+            self.Layout()
+            self.plotter.Layout()
+            
+
      
     def plotwaveformspec(self, event):
-
+        plt.figure()
         plt.hist(self.data.waveforms, 50, density=True, facecolor="g", alpha=0.75)
         plt.xlabel('Amplitude')
         plt.ylabel('Number of Events')
@@ -440,11 +495,22 @@ class MainPanel(wx.Panel):
         plt.xlim(0, 20)
         plt.ylim(0, 10)
         plt.grid(True)
+        plt.plot()
         plt.show()
         return
 
     def plotchargespec(self, event):
         print("Hello World")
+        plt.figure()
+        plt.hist(self.data.waveforms, 50, density=True, facecolor="g", alpha=0.75)
+        plt.xlabel('Amplitude')
+        plt.ylabel('Number of Events')
+        plt.title('Frequency vs. Amplitude')
+        plt.xlim(0, 20)
+        plt.ylim(0, 10)
+        plt.grid(True)
+        plt.plot()
+        plt.show()
         return
 
 
@@ -452,22 +518,24 @@ class MainPanel(wx.Panel):
 class Data:
     def __init__(self, f):
         data = read_data(f)
-        self.channelassignment = {}
         self.numboards = 2
+        #Nested array, each inner array represents one board, numbers appearing in this array will be indexes according to human (1-8) not (0-7)
         self.loadedchannels = [[], []]
         self.events=data.events
+        #Max of 8 channels
         for i in range(8):
             try:
+                #See if this is defined, if KeyError, then no data exists in channel i 
                 self.events[0][i]
                 if i < 4:
+                    #Data is present, add its index + 1 (i.e. human index rather than computer)
                     self.loadedchannels[0].append(i + 1)
                 else:
+                    # Data is present, add its index + 1 (i.e. human index rather than computer)
                     self.loadedchannels[1].append(i+1)
             except KeyError:
                 continue
         
-        for i in range(len(self.loadedchannels)):
-            self.channelassignment[str(self.loadedchannels[i])] = str(i)
 
 
 
