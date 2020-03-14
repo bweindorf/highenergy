@@ -62,12 +62,18 @@ class PlotNotebook(wx.Panel):
         return page.figure
 
     def on_nb_tab_changed(self, event):
-        index = int(self.nb.GetCurrentPage().name.split()[1]) - 1
         mainpanel = self.parent.panel
-        mainpanel.risetimeval.SetLabel(str(mainpanel.data.risetimes[index]))
-        mainpanel.peaktimeval.SetLabel(str(mainpanel.data.peaktimes[index]))
-        mainpanel.falltimeval.SetLabel(str(mainpanel.data.falltimes[index]))
-        mainpanel.chargeval.SetLabel(str(mainpanel.data.charges[index]))
+        for board in mainpanel.channelmatrix:
+            for channel in board:
+                if channel.IsChecked():
+                    index = int(self.nb.GetCurrentPage().name.split()[1]) - 1
+                    mainpanel.peaktimeval.SetLabel(str(mainpanel.data.stats['single_channel'][board.index(channel)]["peak_time"][index]))
+
+
+
+#        mainpanel.peaktimeval.SetLabel(str(mainpanel.data.peaktimes[index]))
+#        mainpanel.falltimeval.SetLabel(str(mainpanel.data.falltimes[index]))
+#        mainpanel.chargeval.SetLabel(str(mainpanel.data.charges[index]))
         mainpanel.plotter.Layout()
        
 
@@ -488,19 +494,20 @@ class MainPanel(wx.Panel):
      
     def plotwaveformspec(self, event):
         plt.figure()
-        plt.hist(self.data.waveforms, 50, density=True, facecolor="g", alpha=0.75)
+        counts, bins = np.histogram(self.data.stats["single_channel"][0]["amplitude"])
+        plt.hist(bins[:-1], bins, weights=counts)
+#        plt.hist(self.data.stats["single_channel"][0]["amplitude"], 120, density=False, facecolor="g", alpha=0.75)
         plt.xlabel('Amplitude')
         plt.ylabel('Number of Events')
         plt.title('Frequency vs. Amplitude')
-        plt.xlim(0, 20)
-        plt.ylim(0, 10)
+#        plt.xlim(0, 20)
+ #       plt.ylim(0, 10)
         plt.grid(True)
         plt.plot()
         plt.show()
         return
 
     def plotchargespec(self, event):
-        print("Hello World")
         plt.figure()
         plt.hist(self.data.waveforms, 50, density=True, facecolor="g", alpha=0.75)
         plt.xlabel('Amplitude')
@@ -537,17 +544,25 @@ class Data:
                 continue
         
 
+        self.stats = data.calc_stats()
 
 
 
 
 
 
-        self.risetimes = [1,3,5,7,9,2,4,6]
-        self.peaktimes = [9,11,13,15,8,10,12,14]
-        self.falltimes = [17,19,21,23,16,18,20,22] 
-        self.charges = [25,27,29,31,24,26,28,30]  
-        self.waveforms = np.array([15,16,17,18,14,15,15,15,16,10,18,15])       
+
+
+
+
+
+
+
+#        self.risetimes = [1,3,5,7,9,2,4,6]
+#        self.peaktimes = [9,11,13,15,8,10,12,14]
+#        self.falltimes = [17,19,21,23,16,18,20,22] 
+#        self.charges = [25,27,29,31,24,26,28,30]  
+#        self.waveforms = np.array([15,16,17,18,14,15,15,15,16,10,18,15])       
 
 
 

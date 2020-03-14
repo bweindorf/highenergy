@@ -2,6 +2,7 @@ from sys import exit
 #from ROOT import TFile, TTree, TTimeStamp, AddressOf
 #from ROOT.std import vector
 import numpy as np
+import pandas as pd
 from numpy import array, uint32, cumsum, roll, zeros, float32, arange
 from struct import unpack
 from event_classes import DrsoscEventStream, DrsoscEvent

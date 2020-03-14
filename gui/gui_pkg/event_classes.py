@@ -1,7 +1,7 @@
 from struct import unpack
 import numpy as np
 import pandas as pd
-from stats import calc_stats_single_channel
+from stats import calc_stats_single_channel, Stats
 
 
 class DrsoscEventStream(object):
@@ -21,7 +21,9 @@ class DrsoscEventStream(object):
 
     def calc_stats(self):
         self.stats['single_channel'] = calc_stats_single_channel(self.events)
+        self.stats['freq'] = Stats(self.stats)
         return self.stats
+        
 
 class DrsoscEvent(object):
     def __init__(self): # , event_id, event_time):
