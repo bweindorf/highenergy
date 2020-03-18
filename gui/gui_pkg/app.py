@@ -140,7 +140,6 @@ class MainPanel(wx.Panel):
         fileSizer.Add(browser, 0, wx.ALL|wx.CENTER, 0)
         controlSizer.Add(fileSizer, 0, wx.ALL|wx.EXPAND, 0)
         #Create Sizer for Channel Selectors
-        dataselectorSizer=wx.BoxSizer(wx.HORIZONTAL)
         self.board1text = wx.StaticText(self, wx.ID_ANY, "Board 1")
         self.board2text = wx.StaticText(self, wx.ID_ANY, "Board 2")
         board1Sizer = wx.BoxSizer(wx.VERTICAL)
@@ -159,6 +158,11 @@ class MainPanel(wx.Panel):
         self.channel24 = wx.CheckBox(self, id=wx.ID_ANY, label = "Channel 4")
         #Create matrix of channel checkboxes for indexing purposes
         self.channelmatrix = [[self.channel11, self.channel12, self.channel13, self.channel14], [self.channel21, self.channel22, self.channel23, self.channel24]]
+        #Add post analysis triggers
+        dataselectorSizer = wx.BoxSizer(wx.HORIZONTAL)
+        
+    
+        #Channel Select
         for board in self.channelmatrix:
              for channel in board:
                  channel.Hide()
@@ -172,11 +176,32 @@ class MainPanel(wx.Panel):
         board2Sizer.Add(self.channel24, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         dataselectorSizer.Add(board1Sizer, 0, wx.ALL|wx.ALIGN_LEFT, 0)
         dataselectorSizer.Add(board2Sizer, 0, wx.ALL|wx.ALIGN_CENTER, 0)
-        controlSizer.Add(dataselectorSizer, 0, wx.ALL|wx.ALIGN_CENTER, 0)
+        controlSizer.Add(dataselectorSizer, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+
+        #Timing Select
+        self.timeSizer = wx.BoxSizer(wx.VERTICAL)
+        timeselectorSizer = wx.BoxSizer(wx.HORIZONTAL)
+        timing = wx.StaticText(self, id=wx.ID_ANY, label="Timing Difference (ns): ")
+        self.tsetting = wx.SpinCtrl(self, wx.ID_ANY)
+        self.tsettingenable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        timeselectorSizer.Add(timing, 0, wx.ALL|wx.ALIGN_LEFT, 0)
+        timeselectorSizer.Add(self.tsetting, 0, wx.ALL|wx.ALIGN_CENTER, 0)
+        timeselectorSizer.Add(self.tsettingenable, 0, wx.ALL|wx.ALIGN_RIGHT, 0)
+        timechannelselect = wx.BoxSizer(wx.HORIZONTAL)
+        self.channel1 = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        self.channel2 = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        timechannelselect.Add(self.channel1, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        timechannelselect.Add(self.channel2, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.timeSizer.Add(timeselectorSizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.timeSizer.Add(timechannelselect, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        self.timeSizer.ShowItems(False)
+        controlSizer.Add(self.timeSizer, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        #Add graphing button
         self.graphbutton = wx.Button(self, wx.ID_ANY, "Plot")
         self.Bind(wx.EVT_BUTTON, self.graphdata, self.graphbutton)
         self.changechannelbutton = wx.Button(self, wx.ID_ANY, "Reconfigure Channels")
         self.Bind(wx.EVT_BUTTON, self.changechannel, self.changechannelbutton)
+        #Add Option to go to specific event
         self.gototext = wx.StaticText(self, wx.ID_ANY, "Go To Event #: ")
         self.goto = wx.SpinCtrl(self, wx.ID_ANY)
         self.gotobutton = wx.Button(self, wx.ID_ANY, "GO!")
@@ -197,7 +222,10 @@ class MainPanel(wx.Panel):
         controlSizer.Add(graphSizer, 0, wx.ALL|wx.ALIGN_CENTER, 0)        
         #Create blank sizer for separation between end of filesizer and beginning of statistics(characteristics) sizer
         controlSizer.Add(1000,300,0)
+
+
         #Add statistics (characteristics) sizer 
+
         self.stats = wx.BoxSizer(wx.VERTICAL)
         stats = wx.StaticText(self, id=wx.ID_ANY, label = "Statistics")
         #Create Horizontal Sizers for Key Value Pairs
@@ -276,7 +304,7 @@ class MainPanel(wx.Panel):
             self.filename.SetLabel(dname)
             self.fname = name
         dlg.Destroy()
-        print("File Browser Destoyed")
+#        print("File Browser Destoyed")
         return 
 
 # Note about syntax, usually you Bind functions by calling them by name (myFunc as opposed to
@@ -317,19 +345,35 @@ class MainPanel(wx.Panel):
         self.graphbutton.Show()
         #availableboards = self.data.numboards
         availablechannels = self.data.loadedchannels
+        numchannels = len(availablechannels[0]) + len(availablechannels[1]) 
+        if numchannels > 1:
+            self.timeSizer.ShowItems(True)
+            self.mainSizer.Layout()
+
         if len(availablechannels[0]) > 0:
             self.board1text.Show()
 
         if len(availablechannels[1]) > 0:
             self.board2text.Show()
-          
+        
+        strings = []
+        b = 0
         for board in availablechannels:
+            b += 1
+            c = 0
             for channel in board:
+                c += 1
+                string = "B%d C%d" % (b, c)
+                self.channel1.Append(string)
+                self.channel2.Append(string)
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
-                         
+                
+
     def changechannel(self, event):
         # Allow user to check or uncheck boxes, will result in data being regraphed (will not run read_data again)
+        self.timeSizer.ShowItems(True)
+        self.mainSizer.Layout()
         self.prev_button.Hide()
         self.next_button.Hide()
         self.graphbutton.Show()
@@ -361,6 +405,7 @@ class MainPanel(wx.Panel):
                     self.stats.ShowItems(False)
    
             #Clean the current graph and plot the data if at least one checkbox is checked
+                self.timeSizer.ShowItems(False)
                 while(self.plotter.nb.GetPageCount()):
                     self.plotter.nb.DeletePage(0)
                 
@@ -380,16 +425,25 @@ class MainPanel(wx.Panel):
                 self.gototext.Show()
                 self.goto.Show()
                 self.gotobutton.Show()
+                #Need more info on how data from 2nd board is passed in order to use 2nd board
                 for board in self.channelmatrix:
                     for channel in board:
                         channel.Disable()
                         if channel.IsChecked():
-                           #if self.channelmatrix.index(board) == 1: add 4 everywhere...
-                            #self.data.events[event_number][channel]
-                            plt = self.data.events[0][board.index(channel)]
-                 
+                            if self.tsettingenable.IsChecked():
+                                channel1 = self.channel1.GetString(self.channel1.GetSelection())
+                                channel2 = self.channel2.GetString(self.channel2.GetSelection())
+                                eventfound = False
+                                while not eventfound:
+                                    self.index +=1 
+                                    if abs((float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index]))-float((self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index]))) < 50:
+                                        eventfound = True  
+                                    else:
+                                        print("False")
+                                        continue
+  
+                            plt = self.data.events[self.index][board.index(channel)]
                             axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
-                            #graph = axes.plot(self.data.events[0].channel_data[board.index(channel)][0], self.data.events[0].channel_data[board.index(channel)][1], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
                             i += 1
                         else:
                             continue
