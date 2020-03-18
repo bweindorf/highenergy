@@ -390,6 +390,8 @@ class MainPanel(wx.Panel):
                 
                    
     def graphdata(self, event):
+            if self.tsettingenable.IsChecked():
+                self.timingdiff = self.tsetting.GetValue()
             numchannels = 0
             for board in self.channelmatrix:
                 for channel in board:
@@ -435,20 +437,25 @@ class MainPanel(wx.Panel):
                                 channel2 = self.channel2.GetString(self.channel2.GetSelection())
                                 eventfound = False
                                 while not eventfound:
-                                    self.index +=1 
-                                    if abs((float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index]))-float((self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index]))) < 50:
+                                    ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
+                                    ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
+                                    diff = abs(ptime1 - ptime2)
+                                    if diff < self.timingdiff: #Threshold
+                                        print(self.index, ptime1, ptime2, diff)
                                         eventfound = True  
+                                        
                                     else:
-                                        print("False")
+                                        self.index += 1
                                         continue
-  
+ 
+ 
                             plt = self.data.events[self.index][board.index(channel)]
                             axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
                             i += 1
+                            axes.legend()
                         else:
                             continue
 
-                    axes.legend()
             else:
                 print("No Channel Selected")    
                 return
@@ -466,33 +473,39 @@ class MainPanel(wx.Panel):
 
     def next(self, event):
       
-        self.index += 1
-      
         #Check to see if current page is last one, if it is then make the next one
         if self.plotter.nb.GetSelection() == self.plotter.nb.GetPageCount() -1:
-            axes = self.plotter.add('Event {}'.format(self.index + 1)).gca()
+            if self.tsettingenable.IsChecked(): #Check to see if user enabled timing discrimination
+                channel1 = self.channel1.GetString(self.channel1.GetSelection())
+                channel2 = self.channel2.GetString(self.channel2.GetSelection())
+                eventfound = False
+                while not eventfound: #Go through until an event falls within timing restriction, automatically changes self.index
+                    self.index += 1
+                    ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
+                    ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
+                    diff = abs(ptime1 - ptime2)
+                    if diff < self.timingdiff: #Threshold
+                        print(self.index, ptime1, ptime2, diff)
+                        eventfound = True  
+                                        
+                    else:
+                        continue
+            else:
+                self.index += 1
+      
+
             colors = ["Black", "Blue", "Green"]
+            axes = self.plotter.add('Event {}'.format(self.index + 1)).gca()
             i = 0
             for board in self.channelmatrix:
                 for channel in board:
                     if channel.IsChecked():
-                        #This will only be used if one channel is checked (it will be defined nonetheless)
-                        #self.channel = NEED TO KNOW HOW STATS ARE BEING PASSED
-                       
                         plt = self.data.events[self.index][board.index(channel)]
-                 
                         axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
-                        #graph = axes.plot(self.data.events[self.index].event[board.index(channel)][1], self.data.events[self.index].event[board.index(channel)][0], label = ("Board %s,Channel %s" % (self.channelmatrix.index(board)+1, board.index(channel) + 1)), color = colors[i])
                         i += 1
                     else:
                         continue
 
-           # for chn in self.requested_channels:
-            #        axes.plot(self.data.events[self.index].event[int(self.data.channelassignment[chn])][1], self.data.events[self.index].event[int(self.data.channelassignment[chn])][0], color = "Black")
-            #axes.plot(self.data.events[self.index + 2].event[0][1], self.data.events[self.index + 2].event[0][0]) #It appears that every other "event" is blank... why?!?!?
-           # axes.plot([self.data.risetimes[self.index], self.data.risetimes[self.index]], [0, 4], color="Red")
-           # axes.plot([self.data.falltimes[self.index], self.data.falltimes[self.index]],[0,4], color="Red")
-           # print(self.data.events[self.index + 1].event[0][0])
             axes.set_title("Voltage vs Time")
             axes.set_ylabel("Voltage (V)")
             axes.set_xlabel("Time (ns)")
