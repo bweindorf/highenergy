@@ -68,6 +68,9 @@ class PlotNotebook(wx.Panel):
                 if channel.IsChecked():
                     index = int(self.nb.GetCurrentPage().name.split()[1]) - 1
                     mainpanel.peaktimeval.SetLabel(str(mainpanel.data.stats['single_channel'][board.index(channel)]["peak_time"][index]))
+                    mainpanel.risetimeval.SetLabel(str(mainpanel.data.stats['single_channel'][board.index(channel)]["rise_time"][index]))
+                    mainpanel.risetimeval.SetLabel(str(mainpanel.data.stats['single_channel'][board.index(channel)]["rise_time"][index]))
+                    mainpanel.amplitudeval.SetLabel(str(mainpanel.data.stats['single_channel'][board.index(channel)]["amplitude"][index]))
 
 
 
@@ -238,20 +241,24 @@ class MainPanel(wx.Panel):
         peaktime = wx.StaticText(self, id=wx.ID_ANY, label = "Peak Time")
         falltime = wx.StaticText(self, id=wx.ID_ANY, label = "Fall Time")
         charge = wx.StaticText(self, id=wx.ID_ANY, label = "Charge")
+        amplitude = wx.StaticText(self, id=wx.ID_ANY, label = "Amplitude")
         #Create blank labels (Values) for the actual values to go in  
         self.risetimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Rise Val")
         self.peaktimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Peak Val")
         self.falltimeval = wx.StaticText(self, id=wx.ID_ANY, label = "Fall Val")
         self.chargeval = wx.StaticText(self, id=wx.ID_ANY, label = "Charge Val")
+        self.amplitudeval = wx.StaticText(self, id=wx.ID_ANY, label = "Amplitude Val")
         #Add keys and values to respective sizers
         keysizer.Add(risetime, 0, wx.ALIGN_LEFT,0)
         keysizer.Add(peaktime, 0, wx.ALIGN_LEFT, 0)
         keysizer.Add(falltime, 0, wx.ALIGN_LEFT, 0)
         keysizer.Add(charge, 0, wx.ALIGN_LEFT, 0)
+        keysizer.Add(amplitude, 0, wx.ALIGN_LEFT, 0)
         valsizer.Add(self.risetimeval, 0, wx.ALIGN_LEFT, 0)
         valsizer.Add(self.peaktimeval, 0, wx.ALIGN_LEFT, 0)
         valsizer.Add(self.falltimeval, 0, wx.ALIGN_LEFT, 0)
         valsizer.Add(self.chargeval, 0, wx.ALIGN_LEFT, 0)
+        valsizer.Add(self.amplitudeval, 0, wx.ALIGN_LEFT, 0)
         #Add key and value pairs to charkeyvalsizer
         charkeyvalsizer.Add(keysizer, 0, wx.ALL, 0)
         #Blank sizer for formatting purposes
@@ -432,23 +439,33 @@ class MainPanel(wx.Panel):
                     for channel in board:
                         channel.Disable()
                         if channel.IsChecked():
-                            if self.tsettingenable.IsChecked():
-                                channel1 = self.channel1.GetString(self.channel1.GetSelection())
-                                channel2 = self.channel2.GetString(self.channel2.GetSelection())
-                                eventfound = False
-                                while not eventfound:
-                                    ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
-                                    ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
-                                    diff = abs(ptime1 - ptime2)
-                                    if diff < self.timingdiff: #Threshold
-                                        print(self.index, ptime1, ptime2, diff)
-                                        eventfound = True  
+                            while True:
+                                print("True")
+                                if self.tsettingenable.IsChecked():
+                                    print("Checked")
+                                    channel1 = self.channel1.GetString(self.channel1.GetSelection())
+                                    channel2 = self.channel2.GetString(self.channel2.GetSelection())
+                                    eventfound = False
+                                    while not eventfound:
+                                        print("Event not found")
+                                        ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
+                                        ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
+                                        diff = abs(ptime1 - ptime2)
+                                        print(diff)
+                                        if diff < self.timingdiff: #Threshold
+                                            print(self.index, ptime1, ptime2, diff)
+                                            eventfound = True  
                                         
-                                    else:
-                                        self.index += 1
-                                        continue
- 
- 
+                                        else:
+                                            self.index += 1
+                                            continue
+                            #if self.ampsetting.IsChecked():
+                                #amp = self.amp.GetValue()
+                                #if amp > critical amp:
+                                    #break
+                           
+                                break
+
                             plt = self.data.events[self.index][board.index(channel)]
                             axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
                             i += 1

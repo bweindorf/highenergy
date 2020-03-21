@@ -78,7 +78,7 @@ def process_single_channel_per_event_channel(time_series, processors):
 def calc_stats_single_channel(
     event_series,
     processors = ['moving_avg'],
-    stats = ['peak_time', 'amplitude', 'rise_time']
+    stats = ['peak_time', 'amplitude', 'rise_time', 'charge' ]
 ):
     
     new_events = event_series.map(
