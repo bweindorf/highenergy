@@ -95,8 +95,30 @@ class Plot(wx.Panel):
         sizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
         self.SetSizer(sizer)
 
+class AmplitudeSelect():
+    def __init__(self, parent, ampsizer, board):
+        self.board = board
+        self.parent = parent
+        self.ampsizer = ampsizer
 
+    def buildsizers(self):
+        boardtext = wx.StaticText(self.parent, id=wx.ID_ANY, label ="Board %d" % self.board)
+        self.ampsizer.Add(boardtext, 0, wx.ALL|wx.ALIGN_CENTER, 0)
+        print(boardtext)
+        channels = []
+        for i in range(4):
+            sizer = wx.BoxSizer(wx.HORIZONTAL)
+            amp = wx.StaticText(self.parent, id=wx.ID_ANY, label="Channel %d Amplitude (mv): " % (i + 1))
+            ampval = wx.SpinCtrl(self.parent, wx.ID_ANY)
+            ampenable = wx.CheckBox(self.parent, id=wx.ID_ANY, label = "Enable")
+            sizer.Add(amp, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+            sizer.Add(ampval, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+            sizer.Add(ampenable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+            self.ampsizer.Add(sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT,0)
+            channels.append(sizer)
 
+        return channels
+        
 class MainPanel(wx.Panel):
     
     def __init__(self, parent, id, pos, size):
@@ -200,89 +222,15 @@ class MainPanel(wx.Panel):
         self.timeSizer.Add(timechannelselect, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
         self.timeSizer.ShowItems(False)
         controlSizer.Add(self.timeSizer, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        
+
         #Amplitude(s) Select
         self.ampsizer = wx.BoxSizer(wx.VERTICAL)
-        #Board 1 Channel 1
-        self.ampb1text = wx.StaticText(self, id=wx.ID_ANY, label ="Board 1")
-        amp11sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp11 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 1 Amplitude (mv): ")
-        self.amp11 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp11enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp11sizer.Add(amp11, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp11sizer.Add(self.amp11, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp11sizer.Add(self.amp11enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(self.ampb1text, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        self.ampsizer.Add(amp11sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 1 Channel 2
-        amp12sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp12 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 2 Amplitude (mv): ")
-        self.amp12 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp12enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp12sizer.Add(amp12, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp12sizer.Add(self.amp12, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp12sizer.Add(self.amp12enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(amp12sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 1 Channel 3
-        amp13sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp13 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 3 Amplitude (mv): ")
-        self.amp13 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp13enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp13sizer.Add(amp13, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp13sizer.Add(self.amp13, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp13sizer.Add(self.amp13enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(amp13sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 1 Channel 4
-        amp14sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp14 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 4 Amplitude (mv): ")
-        self.amp14 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp14enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp14sizer.Add(amp14, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp14sizer.Add(self.amp14, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp14sizer.Add(self.amp14enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(amp14sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 2 Channel 1
-        self.ampb2text = wx.StaticText(self, id=wx.ID_ANY, label ="Board 2")
-        amp21sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp21 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 1 Amplitude (mv): ")
-        self.amp21 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp21enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp21sizer.Add(amp21, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp21sizer.Add(self.amp21, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp21sizer.Add(self.amp21enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(self.ampb2text, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        self.ampsizer.Add(amp21sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 2 Channel 2
-        amp22sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp22 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 2 Amplitude (mv): ")
-        self.amp22 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp22enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp22sizer.Add(amp22, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp22sizer.Add(self.amp22, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp22sizer.Add(self.amp22enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(amp22sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 2 Channel 3
-        amp23sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp23 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 3 Amplitude (mv): ")
-        self.amp23 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp23enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp23sizer.Add(amp23, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp23sizer.Add(self.amp23, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp23sizer.Add(self.amp23enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(amp23sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        #Board 2 Channel 4
-        amp24sizer = wx.BoxSizer(wx.HORIZONTAL)
-        amp24 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 4 Amplitude (mv): ")
-        self.amp24 = wx.SpinCtrl(self, wx.ID_ANY)
-        self.amp24enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
-        amp24sizer.Add(amp24, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
-        amp24sizer.Add(self.amp24, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
-        amp24sizer.Add(self.amp24enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
-        self.ampsizer.Add(amp24sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        self.ampmatrix = [AmplitudeSelect(self, self.ampsizer, 1).buildsizers(), AmplitudeSelect(self, self.ampsizer, 2).buildsizers()]
+        self.ampsizer.ShowItems(False)
+        
+
         
         #Create amlitude matrix for later reference
-        self.ampmatrix=[[amp11sizer, amp12sizer, amp13sizer, amp14sizer], [amp21sizer, amp22sizer, amp23sizer, amp24sizer]]
-        self.ampsizer.ShowItems(False)        
         controlSizer.Add(self.ampsizer, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
 
         #Add graphing button
@@ -445,12 +393,14 @@ class MainPanel(wx.Panel):
 
         if len(availablechannels[0]) > 0:
             self.board1text.Show()
-            self.ampb1text.Show()
+            self.ampsizer.GetChildren()[0].GetWindow().Show()
+            self.Layout()
 
         if len(availablechannels[1]) > 0:
             self.board2text.Show()
-            self.ampb2text.Show()
-        
+            self.ampsizer.GetChildren()[1].GetWindow().Show()
+            self.ampsizer.GetChildren()[0].GetWindow().Show()
+            self.Layout()        
         #Add String labels to drop down menus for timing select
         strings = []
         b = 0
@@ -470,7 +420,6 @@ class MainPanel(wx.Panel):
     def changechannel(self, event):
         # Allow user to check or uncheck boxes, will result in data being regraphed (will not run read_data again)
         self.timeSizer.ShowItems(True)
-        self.ampsizer.ShowItems(True)
         self.mainSizer.Layout()
         self.prev_button.Hide()
         self.next_button.Hide()
@@ -481,15 +430,24 @@ class MainPanel(wx.Panel):
         self.gotobutton.Hide()
         availableboards = self.data.numboards
         availablechannels = self.data.loadedchannels
+        if len(availablechannels[0]) > 0:
+            self.board1text.Show()
+            self.ampsizer.GetChildren()[0].GetWindow().Show()
+            self.Layout()
+
+        if len(availablechannels[1]) > 0:
+            self.board2text.Show()
+            self.ampsizer.GetChildren()[1].GetWindow().Show()
+            self.ampsizer.GetChildren()[0].GetWindow().Show()
+            self.Layout()        
         for board in availablechannels:
             for channel in board:
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
+                self.ampmatrix[availablechannels.index(board)][channel - 1].ShowItems(True)
         
                 
                    
     def graphdata(self, event):
-            if self.tsettingenable.IsChecked():
-                self.timingdiff = self.tsetting.GetValue()
             numchannels = 0
             for board in self.channelmatrix:
                 for channel in board:
@@ -514,12 +472,7 @@ class MainPanel(wx.Panel):
                 self.next_button.Show()
                 self.prev_button.Show()
                 self.Layout()
-                axes = self.plotter.add('Event 1').gca()
-                axes.set_title("Voltage vs Time")
-                axes.set_ylabel("Voltage (V)")
-                axes.set_xlabel("Time (ns)")
                 colors = ["Black", "Blue", "Green"]
-                axes.grid(True)
                 i = 0
                 self.graphbutton.Hide()
                 self.changechannelbutton.Show()
@@ -527,61 +480,72 @@ class MainPanel(wx.Panel):
                 self.goto.Show()
                 self.gotobutton.Show()
                 #Need more info on how data from 2nd board is passed in order to use 2nd board
+                while True:
+                    fault = False
+                    if self.tsettingenable.IsChecked():
+                        timingdiff = self.tsetting.GetValue()
+                        channel1 = self.channel1.GetString(self.channel1.GetSelection())
+                        channel2 = self.channel2.GetString(self.channel2.GetSelection())
+                        eventfound = False
+                        while True:
+                            print("Event not found")
+                            ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
+                            ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
+                            diff = abs(ptime1 - ptime2)
+                            if diff < timingdiff: #Threshold
+                               break  
+                                        
+                            else:
+                                fault = True
+                                break
+
+                    for board in self.ampmatrix:
+                        for channel in board:
+                            if channel.GetChildren()[2].GetWindow().IsChecked():
+                                triggamp = channel.GetChildren()[1].GetWindow().GetValue()
+                                channelnum = int(channel.GetChildren()[0].GetWindow().GetLabel()[8])-1
+                                amp = float(self.data.stats['single_channel'][channelnum]["amplitude"][self.index]) 
+                                print(amp)
+                                if triggamp > amp * 1000: #Bad
+                                    fault = True
+                                    break
+
+                                else:
+                                    continue              
+                                    
+                            else:
+                                continue
+                                        
+                    if fault == True:
+                        self.index += 1
+                        continue
+                    
+                    else:
+                        break                    
+                      
+
+                print(self.index)
+                axes = self.plotter.add("Event {}".format(self.index + 1)).gca()
                 for board in self.channelmatrix:
                     for channel in board:
                         channel.Disable()
                         if channel.IsChecked():
-                            while True:
-                                print("True")
-                                if self.tsettingenable.IsChecked():
-                                    print("Checked")
-                                    channel1 = self.channel1.GetString(self.channel1.GetSelection())
-                                    channel2 = self.channel2.GetString(self.channel2.GetSelection())
-                                    eventfound = False
-                                    while not eventfound:
-                                        print("Event not found")
-                                        ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
-                                        ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
-                                        diff = abs(ptime1 - ptime2)
-                                        print(diff)
-                                        if diff < self.timingdiff: #Threshold
-                                            print(self.index, ptime1, ptime2, diff)
-                                            eventfound = True  
-                                        
-                                        else:
-                                            self.index += 1
-                                            continue
-
-                                #Convert this to a loop later...
-                                if self.amp11enable.IsChecked():
-                                    amp = float(self.data.stats['single_channel'][0]["amplitude"][self.index]) 
-                                    if amp < self.amp11.GetValue()/1000:
-                                        self.index += 1
-                                        continue
-                           
-           
-                                if self.amp12enable.IsChecked():
-                                    amp = float(self.data.stats['single_channel'][1]["amplitude"][self.index]) 
-                                    if amp < self.amp12.GetValue()/1000:
-                                        self.index += 1
-                                        continue
-                                   
-                                                              
-
-                                break
-
+                            axes.grid(True)
+                            axes.set_title("Voltage vs Time")
+                            axes.set_ylabel("Voltage (V)")
+                            axes.set_xlabel("Time (ns)")
                             plt = self.data.events[self.index][board.index(channel)]
                             axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
                             i += 1
                             axes.legend()
+                       
                         else:
                             continue
+      
 
             else:
                 print("No Channel Selected")    
                 return
-                #axes.plot([self.data.risetimes[0], self.data.risetimes[0]], [0, 4], color="Red")
-                #axes.plot([self.data.falltimes[0], self.data.falltimes[0]],[0,4], color="Red")
         
            
 
@@ -596,47 +560,71 @@ class MainPanel(wx.Panel):
       
         #Check to see if current page is last one, if it is then make the next one
         if self.plotter.nb.GetSelection() == self.plotter.nb.GetPageCount() -1:
-            if self.tsettingenable.IsChecked(): #Check to see if user enabled timing discrimination
-                channel1 = self.channel1.GetString(self.channel1.GetSelection())
-                channel2 = self.channel2.GetString(self.channel2.GetSelection())
-                eventfound = False
-                while not eventfound: #Go through until an event falls within timing restriction, automatically changes self.index
-                    self.index += 1
-                    ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
-                    ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
-                    diff = abs(ptime1 - ptime2)
-                    if diff < self.timingdiff: #Threshold
-                        print(self.index, ptime1, ptime2, diff)
-                        eventfound = True  
+            self.index += 1
+            while True:
+                fault = False
+                if self.tsettingenable.IsChecked():
+                    timingdiff = self.tsetting.GetValue()
+                    channel1 = self.channel1.GetString(self.channel1.GetSelection())
+                    channel2 = self.channel2.GetString(self.channel2.GetSelection())
+                    eventfound = False
+                    while True:
+                        print("Event not found")
+                        ptime1 = float(self.data.stats['single_channel'][int(channel1[-1]) - 1]["peak_time"][self.index])  
+                        ptime2 = float(self.data.stats['single_channel'][int(channel2[-1]) - 1]["peak_time"][self.index])  
+                        diff = abs(ptime1 - ptime2)
+                        if diff < timingdiff: #Threshold
+                            break  
                                         
-                    else:
-                        continue
-            else:
-                self.index += 1
-      
+                        else:
+                            fault = True
+                            break
 
+                for board in self.ampmatrix:
+                    for channel in board:
+                        if channel.GetChildren()[2].GetWindow().IsChecked():
+                            triggamp = channel.GetChildren()[1].GetWindow().GetValue()
+                            channelnum = int(channel.GetChildren()[0].GetWindow().GetLabel()[8])-1
+                            amp = float(self.data.stats['single_channel'][channelnum]["amplitude"][self.index]) 
+                            print(amp)
+                            if triggamp > amp * 1000: #Bad
+                                fault = True
+                                break
+                            else:
+                                continue              
+                                    
+                                        
+                if fault == True:
+                    self.index += 1
+                    continue
+                    
+                else:
+                    break                    
+                      
+
+            print(self.index)
+            axes = self.plotter.add("Event {}".format(self.index + 1)).gca()
             colors = ["Black", "Blue", "Green"]
-            axes = self.plotter.add('Event {}'.format(self.index + 1)).gca()
             i = 0
             for board in self.channelmatrix:
                 for channel in board:
+                    channel.Disable()
                     if channel.IsChecked():
+                        axes.grid(True)
+                        axes.set_title("Voltage vs Time")
+                        axes.set_ylabel("Voltage (V)")
+                        axes.set_xlabel("Time (ns)")
                         plt = self.data.events[self.index][board.index(channel)]
                         axes.plot(plt, label="Channel " + str(board.index(channel) + 1), color = colors[i])
                         i += 1
+                        axes.legend()
+                       
                     else:
                         continue
-
-            axes.set_title("Voltage vs Time")
-            axes.set_ylabel("Voltage (V)")
-            axes.set_xlabel("Time (ns)")
-            axes.legend()
-            self.plotter.nb.AdvanceSelection()
-            self.Layout()
-            self.plotter.Layout()
-            
+            self.plotter.nb.AdvanceSelection(True)
         else:
             self.plotter.nb.AdvanceSelection(True)
+
         return
 
     def previous(self, event):
