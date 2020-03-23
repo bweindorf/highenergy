@@ -5,6 +5,7 @@ import wx
 import wx.lib.plot.polyobjects as po
 import wx.lib.agw.aui as aui
 import wx.lib.mixins.inspection as wit
+from wx.lib.masked import NumCtrl
 import matplotlib as mpl
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -199,6 +200,91 @@ class MainPanel(wx.Panel):
         self.timeSizer.Add(timechannelselect, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
         self.timeSizer.ShowItems(False)
         controlSizer.Add(self.timeSizer, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        
+        #Amplitude(s) Select
+        self.ampsizer = wx.BoxSizer(wx.VERTICAL)
+        #Board 1 Channel 1
+        self.ampb1text = wx.StaticText(self, id=wx.ID_ANY, label ="Board 1")
+        amp11sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp11 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 1 Amplitude (mv): ")
+        self.amp11 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp11enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp11sizer.Add(amp11, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp11sizer.Add(self.amp11, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp11sizer.Add(self.amp11enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(self.ampb1text, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        self.ampsizer.Add(amp11sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 1 Channel 2
+        amp12sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp12 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 2 Amplitude (mv): ")
+        self.amp12 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp12enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp12sizer.Add(amp12, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp12sizer.Add(self.amp12, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp12sizer.Add(self.amp12enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(amp12sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 1 Channel 3
+        amp13sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp13 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 3 Amplitude (mv): ")
+        self.amp13 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp13enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp13sizer.Add(amp13, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp13sizer.Add(self.amp13, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp13sizer.Add(self.amp13enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(amp13sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 1 Channel 4
+        amp14sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp14 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 4 Amplitude (mv): ")
+        self.amp14 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp14enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp14sizer.Add(amp14, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp14sizer.Add(self.amp14, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp14sizer.Add(self.amp14enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(amp14sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 2 Channel 1
+        self.ampb2text = wx.StaticText(self, id=wx.ID_ANY, label ="Board 2")
+        amp21sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp21 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 1 Amplitude (mv): ")
+        self.amp21 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp21enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp21sizer.Add(amp21, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp21sizer.Add(self.amp21, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp21sizer.Add(self.amp21enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(self.ampb2text, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        self.ampsizer.Add(amp21sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 2 Channel 2
+        amp22sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp22 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 2 Amplitude (mv): ")
+        self.amp22 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp22enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp22sizer.Add(amp22, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp22sizer.Add(self.amp22, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp22sizer.Add(self.amp22enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(amp22sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 2 Channel 3
+        amp23sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp23 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 3 Amplitude (mv): ")
+        self.amp23 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp23enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp23sizer.Add(amp23, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp23sizer.Add(self.amp23, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp23sizer.Add(self.amp23enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(amp23sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        #Board 2 Channel 4
+        amp24sizer = wx.BoxSizer(wx.HORIZONTAL)
+        amp24 = wx.StaticText(self, id=wx.ID_ANY, label="Channel 4 Amplitude (mv): ")
+        self.amp24 = wx.SpinCtrl(self, wx.ID_ANY)
+        self.amp24enable = wx.CheckBox(self, id=wx.ID_ANY, label = "Enable")
+        amp24sizer.Add(amp24, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        amp24sizer.Add(self.amp24, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_CENTER, 0)
+        amp24sizer.Add(self.amp24enable, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_RIGHT, 0)
+        self.ampsizer.Add(amp24sizer, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.ALIGN_LEFT, 0)
+        
+        #Create amlitude matrix for later reference
+        self.ampmatrix=[[amp11sizer, amp12sizer, amp13sizer, amp14sizer], [amp21sizer, amp22sizer, amp23sizer, amp24sizer]]
+        self.ampsizer.ShowItems(False)        
+        controlSizer.Add(self.ampsizer, 0, wx.ALL|wx.ALIGN_LEFT|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+
         #Add graphing button
         self.graphbutton = wx.Button(self, wx.ID_ANY, "Plot")
         self.Bind(wx.EVT_BUTTON, self.graphdata, self.graphbutton)
@@ -359,10 +445,13 @@ class MainPanel(wx.Panel):
 
         if len(availablechannels[0]) > 0:
             self.board1text.Show()
+            self.ampb1text.Show()
 
         if len(availablechannels[1]) > 0:
             self.board2text.Show()
+            self.ampb2text.Show()
         
+        #Add String labels to drop down menus for timing select
         strings = []
         b = 0
         for board in availablechannels:
@@ -375,11 +464,13 @@ class MainPanel(wx.Panel):
                 self.channel2.Append(string)
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
+                self.ampmatrix[availablechannels.index(board)][channel - 1].ShowItems(True)
                 
 
     def changechannel(self, event):
         # Allow user to check or uncheck boxes, will result in data being regraphed (will not run read_data again)
         self.timeSizer.ShowItems(True)
+        self.ampsizer.ShowItems(True)
         self.mainSizer.Layout()
         self.prev_button.Hide()
         self.next_button.Hide()
@@ -415,6 +506,7 @@ class MainPanel(wx.Panel):
    
             #Clean the current graph and plot the data if at least one checkbox is checked
                 self.timeSizer.ShowItems(False)
+                self.ampsizer.ShowItems(False)
                 while(self.plotter.nb.GetPageCount()):
                     self.plotter.nb.DeletePage(0)
                 
@@ -459,11 +551,23 @@ class MainPanel(wx.Panel):
                                         else:
                                             self.index += 1
                                             continue
-                            #if self.ampsetting.IsChecked():
-                                #amp = self.amp.GetValue()
-                                #if amp > critical amp:
-                                    #break
+
+                                #Convert this to a loop later...
+                                if self.amp11enable.IsChecked():
+                                    amp = float(self.data.stats['single_channel'][0]["amplitude"][self.index]) 
+                                    if amp < self.amp11.GetValue()/1000:
+                                        self.index += 1
+                                        continue
                            
+           
+                                if self.amp12enable.IsChecked():
+                                    amp = float(self.data.stats['single_channel'][1]["amplitude"][self.index]) 
+                                    if amp < self.amp12.GetValue()/1000:
+                                        self.index += 1
+                                        continue
+                                   
+                                                              
+
                                 break
 
                             plt = self.data.events[self.index][board.index(channel)]
