@@ -1,3 +1,3 @@
-# Example Package
+# HEPPDAP
 
-This the beginning of the GUI package.
+High Energy Particle Physics Data Analysis Package
