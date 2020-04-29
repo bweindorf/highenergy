@@ -1,9 +1,9 @@
 {
 
-TFile* file = new TFile("datfiles/brandon/radiationstudies/run_2fibers_29_5_ch3_tr_10mv_cs137_85cm.root");
+TFile* file = new TFile("file.root");
 
 
-TH1D* hE3 = new TH1D("hE3","Pulse Height Distribution 85cm",50,0,0.02);
+TH1D* hE3 = new TH1D("hE3","Pulse Height Distribution No Water",50,0,0.02);
 rec->Draw("amplitude3>>hE3");
 hE3->Draw();
 
