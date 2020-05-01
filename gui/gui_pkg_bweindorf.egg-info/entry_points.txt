@@ -1,3 +1,0 @@
-[console_scripts]
-gui-pkg = gui_pkg.app:main
-
