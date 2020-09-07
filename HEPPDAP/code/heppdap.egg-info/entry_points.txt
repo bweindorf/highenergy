@@ -1,0 +1,3 @@
+[console_scripts]
+heppdap = heppdap.main:main
+
