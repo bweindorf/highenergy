@@ -9,3 +9,4 @@
 
 Installing Update:
 sudo pip install heppdap --upgrade
+***Note: After the first upgrade, changes won't be caught by this command for an additional expanded period of time
