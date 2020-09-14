@@ -1,0 +1,12 @@
+1. Save changes to python files
+2. Open setup.py
+     => increment version
+3. Delete all files in /dist
+4. sudo python3 setup.py sdist bdist_wheel
+5. sudo python3 -m twine upload dist/*
+     => Enter credentials
+
+
+Installing Update:
+sudo pip install heppdap --upgrade
+***Note: After the first upgrade, changes won't be caught by this command for an additional expanded period of time

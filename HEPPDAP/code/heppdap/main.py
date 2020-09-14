@@ -706,7 +706,7 @@ class MainPanel(wx.Panel):
  
     def plotwaveformspec(self, event):
         plt.figure()
-        amps = self.data.stats["single_channel"][0]["amplitude"]
+        amps = self.data.stats["single_channel"][2]["amplitude"]
         amps.value_counts(normalize = False, sort = False, bins = 250).plot()
         plt.xlabel('Amplitude')
         plt.ylabel('Number of Events')
