@@ -12,7 +12,7 @@ from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as Navigat
 import wx.lib.agw.multidirdialog as MDD
 import wx.lib.inspection
 from heppdap.read_data import read_data
-from channelnames import Channelnameframe
+from heppdap.channelnames import Channelnameframe
 import pandas as pd
 import wx.richtext as rt
 import time
@@ -404,9 +404,13 @@ class MainPanel(wx.Panel):
         controlSizer.Add(self.stats, 0, wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         #Add amplitude (waveform) and charge spectrum buttons
         spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
+        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel Number: ")
+        self.spectrumchannelnumber = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
         self.waveformspec=wx.Button(self, id=wx.ID_ANY, label="Amplitudes")
         self.chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
         self.Bind(wx.EVT_BUTTON, self.plotchargespec, self.chargespec)
+        spectrumsizer.Add(self.spectrumchannelnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        spectrumsizer.Add(self.spectrumchannelnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, self.waveformspec)
         spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
@@ -520,6 +524,7 @@ class MainPanel(wx.Panel):
                 string = "B%d C%d" % (b, c)
                 self.channel1.Append(string)
                 self.channel2.Append(string)
+                self.spectrumchannelnumber.Append(string)
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
                 self.ampmatrix[availablechannels.index(board)][channel - 1].ShowItems(True)
@@ -706,7 +711,8 @@ class MainPanel(wx.Panel):
  
     def plotwaveformspec(self, event):
         plt.figure()
-        amps = self.data.stats["single_channel"][2]["amplitude"]
+        channelnum = int(self.spectrumchannelnumber.GetString(self.spectrumchannelnumber.GetSelection())[-1]) - 1
+        amps = self.data.stats["single_channel"][channelnum]["amplitude"]
         amps.value_counts(normalize = False, sort = False, bins = 250).plot()
         plt.xlabel('Amplitude')
         plt.ylabel('Number of Events')
@@ -758,7 +764,7 @@ class Data:
 
 def main():
     app=MainApp()
-    wx.lib.inspection.InspectionTool().Show()
+#    wx.lib.inspection.InspectionTool().Show()
     app.MainLoop() 
 
 
