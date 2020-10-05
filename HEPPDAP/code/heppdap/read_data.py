@@ -187,6 +187,8 @@ def read_data(input_filename):
             NOTE: the channels 0-3 are for the first board and channels 4-7 are for the second board
             """
             wave = (np.array(voltage_ints)/ 65535.) - 0.5
+#            if max(wave) < abs(min(wave)):
+#                wave = wave * -1
             t_arr = np.array(t)[:len(wave)]
             current_event.add_channel(chn_i -1, t_arr, wave)
             # print('Channel', chn_i, 'min = ', channels_v[chn_i-1].min())

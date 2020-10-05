@@ -20,18 +20,33 @@ class Characteristics:
         return self.series.integrate()/50
 
     def amplitude(self):
-        return self.series[self.peak_time()]
+       # return self.series[self.peak_time()]
+        return np.nanmax(self.series.values)
 
     def peak_time(self):
         if not self._peak_time:
             self._peak_time = self.series.idxmax()
+            #print(self.series[self._peak_time])
         return self._peak_time
 
     def rise_time(self, threshold = .1):
         if self._rise_time:
             return self._rise_time
-        self.series
+        #self.series
         abs_threshold = self.amplitude() * threshold
+        voltage = self.amplitude()
+        time_index = np.where(self.series.index.values == self.peak_time())[0][0]
+        while voltage > abs_threshold:
+            time_index = time_index - 1
+            voltage = self.series.values[time_index]
+
+#            print(voltage)
+#        print(self.series.index.values[time_index-1])
+#        print(self.series.index.values[time_index])
+#        print(self.series.index.values[time_index+1])
+        return self.series.index.values[time_index]
+
+
         rise_moment = (self.series > abs_threshold).idxmax()
         rise_val = self.series[rise_moment]
         time_index = self.series.index
@@ -81,16 +96,16 @@ def calc_stats_single_channel(
     stats = ['peak_time', 'amplitude', 'rise_time', 'charge' ]
 ):
     
-    new_events = event_series.map(
-        lambda event: event.map(
-            lambda time_series:process_single_channel_per_event_channel(time_series, processors)
-        )
-    )
+#    new_events = event_series.map(
+#        lambda event: event.map(
+#            lambda time_series:process_single_channel_per_event_channel(time_series, processors)
+#        )
+#    )
 
     stat_dict = pd.Series([ {
         stat: [] for stat in stats
     } for channel in event_series[0]], index=event_series[0].index)
-    for event in new_events:
+    for event in event_series:
         for channel, channel_event in event.items():
             for stat in stats:
                 stat_calculator = Characteristics(channel_event)
