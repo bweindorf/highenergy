@@ -1,3 +1,4 @@
+import argparse
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,11 +12,25 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 import wx.lib.agw.multidirdialog as MDD
 import wx.lib.inspection
-from heppdap.read_data import read_data
-from heppdap.channelnames import Channelnameframe
 import pandas as pd
 import wx.richtext as rt
 import time
+from scipy.signal import find_peaks
+
+#Allow scripts in local git folder to be run for developmental purposes
+parser = argparse.ArgumentParser(description='Set Mode')
+parser.add_argument('-e', action = "store_true")
+args = parser.parse_args()
+editmode = args.e
+
+if editmode:
+    import read_data
+    import channelnames
+    read_data.init(editmode)
+else:
+    import heppdap.read_data as read_data
+    import heppdap.channelnames as channelnames
+
 
 
 ## Main script that runs the GUI program for HEPPDAP. Upon initial run, the app object is created
@@ -172,7 +187,9 @@ class PlotNotebook(wx.Panel):
         mainpanel.peaktimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["peak_time"][index]))
 #        mainpanel.risetimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["rise_time"][index]))
         mainpanel.risetimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["rise_time"][index]))
+        mainpanel.falltimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["fall_time"][index]))
         mainpanel.amplitudeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["amplitude"][index]))
+        mainpanel.chargeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["charge"][index]))
 
 
         #Refresh the mainpanel
@@ -435,7 +452,7 @@ class MainPanel(wx.Panel):
         self.channelnamesset = False
 
     def configchannelname(self, event):
-        self.channelnameframe = Channelnameframe("Channel Designations", self.data.loadedchannels, self.fname)
+        self.channelnameframe = channelnames.Channelnameframe("Channel Designations", self.data.loadedchannels, self.fname)
         self.channelnameframe.SetSize(1000,800)
         self.channelnameframe.Show()
 
@@ -496,6 +513,11 @@ class MainPanel(wx.Panel):
     def showchannels(self):
         #Iterate through the channels, and display the ones that read_data has available
         self.graphbutton.Show()
+        self.risetimeval.SetLabel("")
+        self.falltimeval.SetLabel("")
+        self.peaktimeval.SetLabel("")
+        self.amplitudeval.SetLabel("")
+        self.chargeval.SetLabel("")
         #multidimensional array that is indexed by board and then channel
         availablechannels = self.data.loadedchannels
         numchannels = len(availablechannels[0]) + len(availablechannels[1]) 
@@ -713,7 +735,16 @@ class MainPanel(wx.Panel):
         plt.figure()
         channelnum = int(self.spectrumchannelnumber.GetString(self.spectrumchannelnumber.GetSelection())[-1]) - 1
         amps = self.data.stats["single_channel"][channelnum]["amplitude"]
-        amps.value_counts(normalize = False, sort = False, bins = 250).plot()
+        amphist = amps.plot.hist(bins = 500)
+        amphist.plot()
+#        amppeaks = np.histogram(amps, bins = 500)[0]
+#        indices = find_peaks(amppeaks)[0]
+#        scatter = pd.DataFrame(amppeaks[indices], indices, columns=["Peaks", "Indices"])
+#        print(amppeaks[[0, 5, 7, 9, 12]])
+#        print(indices)
+#        ax = scatter.plot.scatter(x="Peaks", y = "Indices", c = "Red")
+#        ax.plot()
+#        amps.value_counts(normalize = False, sort = False, bins = 500).plot()
         plt.xlabel('Amplitude')
         plt.ylabel('Number of Events')
         plt.title('Frequency vs. Amplitude')
@@ -739,7 +770,7 @@ class MainPanel(wx.Panel):
 
 class Data:
     def __init__(self, f):
-        data = read_data(f)
+        data = read_data.read_data(f)
         self.numboards = 2
         #Nested array, each inner array represents one board, numbers appearing in this array will be indexes according to human (1-8) not (0-7)
         self.loadedchannels = [[], []]

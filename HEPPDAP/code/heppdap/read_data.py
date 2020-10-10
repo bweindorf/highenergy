@@ -5,8 +5,17 @@ import numpy as np
 import pandas as pd
 from numpy import array, uint32, cumsum, roll, zeros, float32, arange
 from struct import unpack
-from heppdap.event_classes import DrsoscEventStream, DrsoscEvent
+# from heppdap.event_classes import DrsoscEventStream, DrsoscEvent
 import time
+
+def init(editmode):
+    global event_classes
+    if editmode:
+        import event_classes
+        event_classes.init(editmode)
+
+    else:
+        import heppdap.event_classes as event_classes 
 
 def read_data(input_filename):
     start_time = time.perf_counter()
@@ -61,7 +70,7 @@ def read_data(input_filename):
 
     # Empty lists for containing the variables connected to the tree branches
     result = []
-    event_stream = DrsoscEventStream()
+    event_stream = event_classes.DrsoscEventStream()
 
     # List of numpy arrays to store the time bin information
     timebins = []
@@ -122,7 +131,7 @@ def read_data(input_filename):
             is_new_event = False
             if current_event != None:
                 event_stream.events.append(current_event.complete())
-            current_event = DrsoscEvent()
+            current_event = event_classes.DrsoscEvent()
             # Set the timestamp, where the milliseconds need to be converted to
             # nanoseconds to fit the function arguments
             dt_list = unpack("H"*8, f.read(16))
