@@ -26,11 +26,12 @@ editmode = args.e
 if editmode:
     import read_data
     import channelnames
+    import spectrums
     read_data.init(editmode)
 else:
     import heppdap.read_data as read_data
     import heppdap.channelnames as channelnames
-
+    import heppdap.spectrums as spectrums
 
 
 ## Main script that runs the GUI program for HEPPDAP. Upon initial run, the app object is created
@@ -420,21 +421,34 @@ class MainPanel(wx.Panel):
         #Add stats sizer to control sizer
         controlSizer.Add(self.stats, 0, wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         #Add amplitude (waveform) and charge spectrum buttons
-        spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
-        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel Number: ")
-        self.spectrumchannelnumber = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        self.spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
         self.waveformspec=wx.Button(self, id=wx.ID_ANY, label="Amplitudes")
         self.chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
         self.Bind(wx.EVT_BUTTON, self.plotchargespec, self.chargespec)
-        spectrumsizer.Add(self.spectrumchannelnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        spectrumsizer.Add(self.spectrumchannelnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, self.waveformspec)
-        spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        self.waveformspec.Hide()
-        self.chargespec.Hide()
+        self.spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        #self.waveformspec.Hide()
+        #self.chargespec.Hide()
+        self.spectrumsizer.ShowItems(False)
         controlSizer.Add(100,50,0)
-        controlSizer.Add(spectrumsizer, 0, wx.ALIGN_CENTER, 0)          
+        controlSizer.Add(self.spectrumsizer, 0, wx.ALIGN_CENTER, 0)          
+        
+
+        self.spectrumsettings = wx.BoxSizer(wx.HORIZONTAL)
+        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel Number: ")
+        self.spectrumchannelnumber = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        self.spectrumsettings.Add(self.spectrumchannelnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.Add(self.spectrumchannelnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.binnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Bins: ")
+        self.binnumber = wx.SpinCtrl(self, id=wx.ID_ANY)
+        self.binnumber.SetMax(1000)
+        self.binnumber.SetValue(500)
+        self.spectrumsettings.Add(self.binnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.Add(self.binnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.ShowItems(False)
+        controlSizer.Add(self.spectrumsettings, 0, wx.ALIGN_CENTER, 0)
+
         #Add Feedback Sizer
         self.fbtext = wx.TextCtrl(self, id=wx.ID_ANY, size=(1000,200), style = wx.TE_READONLY|wx.TE_LEFT|wx.TE_MULTILINE)
         style = self.fbtext.GetWindowStyle()
@@ -490,8 +504,10 @@ class MainPanel(wx.Panel):
             self.gototext.Hide()
             self.goto.Hide()
             self.gotobutton.Hide()
-            self.waveformspec.Show()
-            self.chargespec.Show()
+            #self.waveformspec.Show()
+            #self.chargespec.Show()
+            self.spectrumsizer.ShowItems(True)
+            self.spectrumsettings.ShowItems(True)
             for board in self.channelmatrix:
                 for channel in board:
                     channel.SetValue(False)
@@ -732,25 +748,29 @@ class MainPanel(wx.Panel):
     
  
     def plotwaveformspec(self, event):
-        plt.figure()
+#        hist = Spectrumframe()
+#        plt.figure()
         channelnum = int(self.spectrumchannelnumber.GetString(self.spectrumchannelnumber.GetSelection())[-1]) - 1
         amps = self.data.stats["single_channel"][channelnum]["amplitude"]
-        amphist = amps.plot.hist(bins = 500)
-        amphist.plot()
-#        amppeaks = np.histogram(amps, bins = 500)[0]
-#        indices = find_peaks(amppeaks)[0]
-#        scatter = pd.DataFrame(amppeaks[indices], indices, columns=["Peaks", "Indices"])
-#        print(amppeaks[[0, 5, 7, 9, 12]])
-#        print(indices)
-#        ax = scatter.plot.scatter(x="Peaks", y = "Indices", c = "Red")
-#        ax.plot()
-#        amps.value_counts(normalize = False, sort = False, bins = 500).plot()
-        plt.xlabel('Amplitude')
-        plt.ylabel('Number of Events')
-        plt.title('Frequency vs. Amplitude')
-        plt.show()
-        plt.grid(True)
-        plt.plot()
+        bins = self.binnumber.GetValue()
+#        amphist = amps.plot.hist(bins = bins)
+        title = "Channel %d (Bins = %d)" % (channelnum + 1, bins)
+        hist = spectrums.Spectrumframe(title = title, data = amps, bins = bins)
+#        amphist.plot()
+##        amppeaks = np.histogram(amps, bins = 500)[0]
+##        indices = find_peaks(amppeaks)[0]
+##        scatter = pd.DataFrame(amppeaks[indices], indices, columns=["Peaks", "Indices"])
+##        print(amppeaks[[0, 5, 7, 9, 12]])
+##        print(indices)
+##        ax = scatter.plot.scatter(x="Peaks", y = "Indices", c = "Red")
+##        ax.plot()
+##        amps.value_counts(normalize = False, sort = False, bins = 500).plot()
+#        plt.xlabel('Amplitude')
+#        plt.ylabel('Number of Events')
+#        plt.title('Frequency vs. Amplitude')
+#        plt.show()
+#        plt.grid(True)
+#        plt.plot()
         return
 
     def plotchargespec(self, event):
