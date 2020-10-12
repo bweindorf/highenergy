@@ -27,11 +27,14 @@ if editmode:
     import read_data
     import channelnames
     import spectrums
+    import fnameparser
     read_data.init(editmode)
 else:
     import heppdap.read_data as read_data
     import heppdap.channelnames as channelnames
     import heppdap.spectrums as spectrums
+    import heppdap.fnameparser as fnameparser
+    read_data.init(editmode)
 
 
 ## Main script that runs the GUI program for HEPPDAP. Upon initial run, the app object is created
@@ -486,6 +489,7 @@ class MainPanel(wx.Panel):
             paths = dlg.GetPaths()
             name = paths[0]
             dname = paths[0].split("/")[-1]
+            self.dname = dname
             self.filename.SetLabel(dname)
             self.fname = name
         dlg.Destroy()
@@ -755,7 +759,8 @@ class MainPanel(wx.Panel):
         bins = self.binnumber.GetValue()
 #        amphist = amps.plot.hist(bins = bins)
         title = "Channel %d (Bins = %d)" % (channelnum + 1, bins)
-        hist = spectrums.Spectrumframe(title = title, data = amps, bins = bins)
+        params = fnameparser.parsefilename(self.dname)
+        hist = spectrums.Spectrumframe(title, data = amps, bins = bins, mode = "Amplitudes", params=params)
 #        amphist.plot()
 ##        amppeaks = np.histogram(amps, bins = 500)[0]
 ##        indices = find_peaks(amppeaks)[0]

@@ -28,13 +28,22 @@ class Spectrumframe (wx.Frame):
     Class used for creating frames other than the main one
     """
 
-    def __init__(self, title = "Spectrum", parent=None, data = df, bins = 100):
+    def __init__(self, title = "Spectrum", parent=None, data = df, bins = 100, mode = None, params = None):
  #       app=wx.App(None)
         super().__init__(None, title=title)
         self.plotter = PlotNotebook(self, id=-1, pos=(100,100), size=(300,300))                
         axes = self.plotter.add("Plot").gca()
         axes.hist(data, bins = bins)
-        print(type(axes))
+        axes.set_xlabel(mode)
+        axes.set_ylabel("Number of Events")
+        axes.set_title(title)
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+        if params != 1:
+            string = ""
+            for key in params:
+                string += (key + ": " + params[key] + '\n') 
+            axes.text(0.01, 0.95, string, transform = axes.transAxes, verticalalignment='top', bbox=props)   
         self.Show()
 
 

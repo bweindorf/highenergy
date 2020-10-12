@@ -16,6 +16,7 @@ def init(editmode):
 
     else:
         import heppdap.event_classes as event_classes 
+        event_classes.init(editmode)
 
 def read_data(input_filename):
     start_time = time.perf_counter()
