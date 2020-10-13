@@ -18,7 +18,7 @@ def init(editmode):
         import heppdap.event_classes as event_classes 
         event_classes.init(editmode)
 
-def read_data(input_filename):
+def read_data(input_filename, textbox):
     start_time = time.perf_counter()
     """
     Script to convert binary format to root for DRS4 evaluation boards.
@@ -121,7 +121,7 @@ def read_data(input_filename):
     is_new_event = True
 
     info_string = "Reading in events measurend with {0} channels on {1} board(s)..."
-    print(info_string.format(n_ch, n_boards))
+    textbox.AppendText(info_string.format(n_ch, n_boards))
 
     current_event = None
     while True:
@@ -212,6 +212,6 @@ def read_data(input_filename):
     # Clean up
     f.close()
     event_stream.complete()
-    print("Took ", time.perf_counter() - start_time)
+    textbox.AppendText("Took {:.3f} seconds".format(time.perf_counter() - start_time))
     return event_stream   
 

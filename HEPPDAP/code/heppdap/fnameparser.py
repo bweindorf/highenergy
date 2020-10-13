@@ -9,12 +9,14 @@ def parsefilename(name):
         del configname[0]
 
     mode = configname[0]
-    print(mode)
 
     if mode == "dark" or mode == "light":
-        water = configname[1]
-        fibers = configname[2]
-        crystal = configname[3]
+        try:
+            water = configname[1]
+            fibers = configname[2]
+            crystal = configname[3]
+        except IndexError:
+            return 1
         m = re.findall('ch(\d?)tr_(.+?)_', name, re.DOTALL)
         parsedinfo = dict(Mode=mode, Water = water, Fibers = fibers, Crystal = crystal)
         for tup in m:
