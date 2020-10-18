@@ -5,7 +5,6 @@ from scipy import integrate
 import numpy as np
 import pandas as pd
 
-
 class Characteristics:
     def __init__(self,series):
         self.series = series
@@ -17,6 +16,7 @@ class Characteristics:
         return series.rolling(20).mean()
     
     def charge(self):
+ #       print(self.series.integrate()/50)
         return self.series.integrate()/50
 
     def amplitude(self):
@@ -36,28 +36,33 @@ class Characteristics:
         abs_threshold = self.amplitude() * threshold
         voltage = self.amplitude()
         time_index = np.where(self.series.index.values == self.peak_time())[0][0]
-        while voltage > abs_threshold:
-            time_index = time_index - 1
-            voltage = self.series.values[time_index]
+        try:
+            while voltage > abs_threshold:
+                time_index = time_index - 1
+                voltage = self.series.values[time_index]
 
-#            print(voltage)
-#        print(self.series.index.values[time_index-1])
-#        print(self.series.index.values[time_index])
-#        print(self.series.index.values[time_index+1])
-        return self.series.index.values[time_index]
+            return self.series.index.values[time_index]
+
+        except IndexError:
+            return "Null"
+
+    def fall_time(self, threshold = .1):
+        try:
+            if self._rise_time:
+                return self._rise_time
+        #self.series
+            abs_threshold = self.amplitude() * threshold
+            voltage = self.amplitude()
+            time_index = np.where(self.series.index.values == self.peak_time())[0][0]
+            while voltage > abs_threshold:
+                time_index = time_index + 1
+                voltage = self.series.values[time_index]
+
+            return self.series.index.values[time_index]
+        except IndexError:
+            return "Null"
 
 
-        rise_moment = (self.series > abs_threshold).idxmax()
-        rise_val = self.series[rise_moment]
-        time_index = self.series.index
-        prev_moment = time_index[time_index.get_loc(rise_moment) - 1]
-        prev_val = self.series[prev_moment]
-        rise_time = prev_moment + (abs_threshold - prev_val) * (rise_moment - prev_moment) / (rise_val - prev_val)
-        # print(rise_moment, time_index.get_loc(rise_moment))
-        # print(self.series[rise_moment], self.series.at[rise_moment], self.series.iat[time_index.get_loc(rise_moment)])
-        # print(abs_threshold, rise_moment, rise_val, prev_moment, prev_val, rise_time)
-        # exit(0)
-        return rise_time
 
 class Stats:
     def __init__(self, data_stats):
@@ -93,7 +98,7 @@ def process_single_channel_per_event_channel(time_series, processors):
 def calc_stats_single_channel(
     event_series,
     processors = ['moving_avg'],
-    stats = ['peak_time', 'amplitude', 'rise_time', 'charge' ]
+    stats = ['peak_time', 'amplitude', 'rise_time', 'charge', 'fall_time' ]
 ):
     
 #    new_events = event_series.map(

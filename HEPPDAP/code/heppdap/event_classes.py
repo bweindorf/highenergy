@@ -1,9 +1,17 @@
 from struct import unpack
 import numpy as np
 import pandas as pd
-from heppdap.stats import calc_stats_single_channel, Stats
+# from heppdap.stats import calc_stats_single_channel, Stats
 
+def init(editmode):
+    global stats
 
+    if editmode:
+        import stats
+
+    else:
+        import heppdap.stats as stats
+ 
 class DrsoscEventStream(object):
     def __init__(self):
         self.events = []
@@ -20,8 +28,8 @@ class DrsoscEventStream(object):
         return self.events.map(lambda event: event[chn_i])
 
     def calc_stats(self):
-        self.stats['single_channel'] = calc_stats_single_channel(self.events)
-        self.stats['freq'] = Stats(self.stats)
+        self.stats['single_channel'] = stats.calc_stats_single_channel(self.events)
+        self.stats['freq'] = stats.Stats(self.stats)
         return self.stats
         
 

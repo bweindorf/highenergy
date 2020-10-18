@@ -5,10 +5,20 @@ import numpy as np
 import pandas as pd
 from numpy import array, uint32, cumsum, roll, zeros, float32, arange
 from struct import unpack
-from heppdap.event_classes import DrsoscEventStream, DrsoscEvent
+# from heppdap.event_classes import DrsoscEventStream, DrsoscEvent
 import time
 
-def read_data(input_filename):
+def init(editmode):
+    global event_classes
+    if editmode:
+        import event_classes
+        event_classes.init(editmode)
+
+    else:
+        import heppdap.event_classes as event_classes 
+        event_classes.init(editmode)
+
+def read_data(input_filename, textbox):
     start_time = time.perf_counter()
     """
     Script to convert binary format to root for DRS4 evaluation boards.
@@ -61,7 +71,7 @@ def read_data(input_filename):
 
     # Empty lists for containing the variables connected to the tree branches
     result = []
-    event_stream = DrsoscEventStream()
+    event_stream = event_classes.DrsoscEventStream()
 
     # List of numpy arrays to store the time bin information
     timebins = []
@@ -111,7 +121,7 @@ def read_data(input_filename):
     is_new_event = True
 
     info_string = "Reading in events measurend with {0} channels on {1} board(s)..."
-    print(info_string.format(n_ch, n_boards))
+    textbox.AppendText(info_string.format(n_ch, n_boards))
 
     current_event = None
     while True:
@@ -122,7 +132,7 @@ def read_data(input_filename):
             is_new_event = False
             if current_event != None:
                 event_stream.events.append(current_event.complete())
-            current_event = DrsoscEvent()
+            current_event = event_classes.DrsoscEvent()
             # Set the timestamp, where the milliseconds need to be converted to
             # nanoseconds to fit the function arguments
             dt_list = unpack("H"*8, f.read(16))
@@ -202,6 +212,6 @@ def read_data(input_filename):
     # Clean up
     f.close()
     event_stream.complete()
-    print("Took ", time.perf_counter() - start_time)
+    textbox.AppendText("Took {:.3f} seconds".format(time.perf_counter() - start_time))
     return event_stream   
 

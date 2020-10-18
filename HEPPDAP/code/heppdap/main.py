@@ -1,3 +1,4 @@
+import argparse
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,11 +12,29 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 import wx.lib.agw.multidirdialog as MDD
 import wx.lib.inspection
-from heppdap.read_data import read_data
-from heppdap.channelnames import Channelnameframe
 import pandas as pd
 import wx.richtext as rt
 import time
+from scipy.signal import find_peaks
+
+#Allow scripts in local git folder to be run for developmental purposes
+parser = argparse.ArgumentParser(description='Set Mode')
+parser.add_argument('-e', action = "store_true")
+args = parser.parse_args()
+editmode = args.e
+
+if editmode:
+    import read_data
+    import channelnames
+    import spectrums
+    import fnameparser
+    read_data.init(editmode)
+else:
+    import heppdap.read_data as read_data
+    import heppdap.channelnames as channelnames
+    import heppdap.spectrums as spectrums
+    import heppdap.fnameparser as fnameparser
+    read_data.init(editmode)
 
 
 ## Main script that runs the GUI program for HEPPDAP. Upon initial run, the app object is created
@@ -172,7 +191,9 @@ class PlotNotebook(wx.Panel):
         mainpanel.peaktimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["peak_time"][index]))
 #        mainpanel.risetimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["rise_time"][index]))
         mainpanel.risetimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["rise_time"][index]))
+        mainpanel.falltimeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["fall_time"][index]))
         mainpanel.amplitudeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["amplitude"][index]))
+        mainpanel.chargeval.SetLabel(str(mainpanel.data.stats['single_channel'][bindex]["charge"][index]))
 
 
         #Refresh the mainpanel
@@ -206,6 +227,7 @@ class AmplitudeSelect():
         channels = []
         for i in range(4):
             sizer = wx.BoxSizer(wx.HORIZONTAL)
+            self.ampmatrix = []
             amp = wx.StaticText(self.parent, id=wx.ID_ANY, label="Channel %d Amplitude (mv): " % (i + 1))
             #SpinCtlr only accepts numerical inputs
             ampval = wx.SpinCtrl(self.parent, wx.ID_ANY)
@@ -403,21 +425,44 @@ class MainPanel(wx.Panel):
         #Add stats sizer to control sizer
         controlSizer.Add(self.stats, 0, wx.ALL|wx.EXPAND|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         #Add amplitude (waveform) and charge spectrum buttons
-        spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
-        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel Number: ")
-        self.spectrumchannelnumber = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        self.spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
         self.waveformspec=wx.Button(self, id=wx.ID_ANY, label="Amplitudes")
         self.chargespec=wx.Button(self, id=wx.ID_ANY, label="Charges")
         self.Bind(wx.EVT_BUTTON, self.plotchargespec, self.chargespec)
-        spectrumsizer.Add(self.spectrumchannelnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        spectrumsizer.Add(self.spectrumchannelnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsizer.Add(self.waveformspec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.Bind(wx.EVT_BUTTON, self.plotwaveformspec, self.waveformspec)
-        spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
-        self.waveformspec.Hide()
-        self.chargespec.Hide()
+        self.spectrumsizer.Add(self.chargespec, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        #self.waveformspec.Hide()
+        #self.chargespec.Hide()
+        self.spectrumsizer.ShowItems(False)
         controlSizer.Add(100,50,0)
-        controlSizer.Add(spectrumsizer, 0, wx.ALIGN_CENTER, 0)          
+        controlSizer.Add(self.spectrumsizer, 0, wx.ALIGN_CENTER, 0)          
+        
+
+        self.spectrumsettings = wx.BoxSizer(wx.HORIZONTAL)
+        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel Number:")
+        self.spectrumchannelnumber = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        self.spectrumsettings.Add(self.spectrumchannelnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.Add(self.spectrumchannelnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.binnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Bins:")
+        self.binnumber = wx.SpinCtrl(self, id=wx.ID_ANY)
+        self.binnumber.SetMax(1000)
+        self.binnumber.SetValue(500)
+        self.xminlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Min:")
+        self.xmin = wx.TextCtrl(self)
+        self.xmaxlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Max:")
+        self.xmax = wx.TextCtrl(self)
+        self.range = wx.BoxSizer(wx.HORIZONTAL)
+        self.spectrumsettings.Add(self.binnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.Add(self.binnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.range.Add(self.xminlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.range.Add(self.xmin, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.range.Add(self.xmaxlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.range.Add(self.xmax, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.ShowItems(False)
+        self.range.ShowItems(False)
+        controlSizer.Add(self.spectrumsettings, 0, wx.ALIGN_CENTER, 0)
+        controlSizer.Add(self.range, 0, wx.ALIGN_CENTER, 0)
         #Add Feedback Sizer
         self.fbtext = wx.TextCtrl(self, id=wx.ID_ANY, size=(1000,200), style = wx.TE_READONLY|wx.TE_LEFT|wx.TE_MULTILINE)
         style = self.fbtext.GetWindowStyle()
@@ -435,7 +480,7 @@ class MainPanel(wx.Panel):
         self.channelnamesset = False
 
     def configchannelname(self, event):
-        self.channelnameframe = Channelnameframe("Channel Designations", self.data.loadedchannels, self.fname)
+        self.channelnameframe = channelnames.Channelnameframe("Channel Designations", self.data.loadedchannels, self.fname)
         self.channelnameframe.SetSize(1000,800)
         self.channelnameframe.Show()
 
@@ -455,6 +500,7 @@ class MainPanel(wx.Panel):
             paths = dlg.GetPaths()
             name = paths[0]
             dname = paths[0].split("/")[-1]
+            self.dname = dname
             self.filename.SetLabel(dname)
             self.fname = name
         dlg.Destroy()
@@ -473,8 +519,13 @@ class MainPanel(wx.Panel):
             self.gototext.Hide()
             self.goto.Hide()
             self.gotobutton.Hide()
-            self.waveformspec.Show()
-            self.chargespec.Show()
+            #self.waveformspec.Show()
+            #self.chargespec.Show()
+            self.ampsizer.ShowItems(False)
+            self.timeSizer.ShowItems(False)
+            self.spectrumsizer.ShowItems(True)
+            self.spectrumsettings.ShowItems(True)
+            self.range.ShowItems(True)
             for board in self.channelmatrix:
                 for channel in board:
                     channel.SetValue(False)
@@ -483,10 +534,11 @@ class MainPanel(wx.Panel):
             while(self.plotter.nb.GetPageCount()):
                 self.plotter.nb.DeletePage(0)
 
-            self.data = Data(f)
+            self.data = Data(f, self.fbtext)
             self.goto.SetMin(1)
             self.goto.SetMax(len(self.data.events))
             self.goto.SetValue(1)
+            self.spectrumchannelnumber.SetItems(["None"])
             self.showchannels()
         else:
             self.fbtext.AppendText("Select Different File\n")
@@ -496,6 +548,11 @@ class MainPanel(wx.Panel):
     def showchannels(self):
         #Iterate through the channels, and display the ones that read_data has available
         self.graphbutton.Show()
+        self.risetimeval.SetLabel("")
+        self.falltimeval.SetLabel("")
+        self.peaktimeval.SetLabel("")
+        self.amplitudeval.SetLabel("")
+        self.chargeval.SetLabel("")
         #multidimensional array that is indexed by board and then channel
         availablechannels = self.data.loadedchannels
         numchannels = len(availablechannels[0]) + len(availablechannels[1]) 
@@ -528,7 +585,8 @@ class MainPanel(wx.Panel):
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
                 self.ampmatrix[availablechannels.index(board)][channel - 1].ShowItems(True)
-                
+
+
 
     def changechannel(self, event):
         # Allow user to check or uncheck boxes, will result in data being regraphed (will not run read_data again)
@@ -651,7 +709,8 @@ class MainPanel(wx.Panel):
                 for channel in board:
                     if channel.GetChildren()[2].GetWindow().IsChecked():
                         triggamp = channel.GetChildren()[1].GetWindow().GetValue()
-                        channelnum = int(channel.GetChildren()[0].GetWindow().GetLabel()[8])-1
+                        channelnum = int(channel.GetChildren()[0].GetWindow().GetLabel()[8])-1                      
+                        self.fbtext.Append("Please Select Channel")
                         amp = float(self.data.stats['single_channel'][channelnum]["amplitude"][index]) 
                         #print(amp)
                         if triggamp > amp * 1000: #Bad
@@ -710,17 +769,27 @@ class MainPanel(wx.Panel):
     
  
     def plotwaveformspec(self, event):
-        plt.figure()
-        channelnum = int(self.spectrumchannelnumber.GetString(self.spectrumchannelnumber.GetSelection())[-1]) - 1
+        try:
+            channelnum = int(self.spectrumchannelnumber.GetString(self.spectrumchannelnumber.GetSelection())[-1]) - 1
+        except ValueError:
+            self.fbtext.AppendText("Please Select a Channel")
+            return
+
         amps = self.data.stats["single_channel"][channelnum]["amplitude"]
-        amps.value_counts(normalize = False, sort = False, bins = 250).plot()
-        plt.xlabel('Amplitude')
-        plt.ylabel('Number of Events')
-        plt.title('Frequency vs. Amplitude')
-        plt.show()
-        plt.grid(True)
-        plt.plot()
+        bins = self.binnumber.GetValue()
+        title = "Channel %d (Bins = %d)" % (channelnum + 1, bins)
+        params = fnameparser.parsefilename(self.dname)
+
+        try:
+            xmin = float(self.xmin.GetValue())
+            xmax = float(self.xmax.GetValue())
+        except ValueError:
+            self.fbtext.AppendText("Enter Valid Numbers")
+            return
+
+        hist = spectrums.Spectrumframe(title, data = amps, bins = bins, mode = "Amplitudes", params=params, xmin = xmin, xmax = xmax)
         return
+
 
     def plotchargespec(self, event):
         plt.figure()
@@ -738,8 +807,8 @@ class MainPanel(wx.Panel):
 
 
 class Data:
-    def __init__(self, f):
-        data = read_data(f)
+    def __init__(self, f, textbox):
+        data = read_data.read_data(f, textbox)
         self.numboards = 2
         #Nested array, each inner array represents one board, numbers appearing in this array will be indexes according to human (1-8) not (0-7)
         self.loadedchannels = [[], []]
