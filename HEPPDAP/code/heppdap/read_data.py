@@ -34,7 +34,6 @@ def read_data(input_filename, textbox):
     ########################################
 
     f = open( input_filename, "rb")
-
     ########################################
     # Prepare Output
     ########################################
@@ -117,7 +116,7 @@ def read_data(input_filename, textbox):
 
     current_board = 0
     tcell = 0 # current trigger cell
-    t_00 = 0 # time in first cell in first channel for alignment
+    t_00 = 0 # time in first /cell in first channel for alignment
     is_new_event = True
 
     info_string = "Reading in events measurend with {0} channels on {1} board(s)..."
@@ -179,7 +178,13 @@ def read_data(input_filename, textbox):
             The width of the bins 1024-2047 is identical to the bins 0-1023, that is why the arrays are simply extended
             before performing the cumsum operation
             """
-            timebins_full = list(roll(timebins[chn_i-1], -tcell))+list(roll(timebins[chn_i-1], -tcell))
+            for i in range(8):
+                try:
+                    timebins_full = list(roll(timebins[i], -tcell))+list(roll(timebins[i], -tcell))
+                    break
+                except IndexError:
+                    continue
+                    
             t = cumsum(timebins_full)[::2]
             # time of first cell for correction, find the time of the first cell for each channel,
             # because only these cells are aligned in time
@@ -213,5 +218,5 @@ def read_data(input_filename, textbox):
     f.close()
     event_stream.complete()
     textbox.AppendText("Took {:.3f} seconds".format(time.perf_counter() - start_time))
-    return event_stream   
+    return event_stream  
 
