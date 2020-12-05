@@ -51,8 +51,10 @@ class ChannelPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.smartread, smart)
         self.Bind(wx.EVT_BUTTON, self.closeout, ok)
         self.Bind(wx.EVT_CLOSE, self.closeout)
-        channelsizer.Add(smart, 0, wx.ALL|wx.EXPAND|wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT, 0)
-        channelsizer.Add(ok, 0, wx.ALL|wx.EXPAND|wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT, 0)
+        #channelsizer.Add(smart, 0, wx.ALL|wx.EXPAND|wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT, 0)
+        channelsizer.Add(smart, 0, wx.ALL|wx.EXPAND, 0)
+        #channelsizer.Add(ok, 0, wx.ALL|wx.EXPAND|wx.ALIGN_BOTTOM|wx.ALIGN_RIGHT, 0)
+        channelsizer.Add(ok, 0, wx.ALL|wx.EXPAND, 0)
         self.SetSizer(channelsizer)
          
     
