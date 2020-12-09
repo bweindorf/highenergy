@@ -165,6 +165,8 @@ def read_data(input_filename, textbox):
 
         # Read and store data
         elif header.startswith(b"C"):
+            print("header = ")
+            print(header)
             # the voltage info is 1024 floats with 2-byte precision
             chn_i = int(header.decode('ascii')[-1]) + current_board * 4
             scaler = unpack('I', f.read(4))
