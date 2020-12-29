@@ -28,12 +28,14 @@ if editmode:
     import channelnames
     import spectrums
     import fnameparser
+    import allevents
     read_data.init(editmode)
 else:
     import heppdap.read_data as read_data
     import heppdap.channelnames as channelnames
     import heppdap.spectrums as spectrums
     import heppdap.fnameparser as fnameparser
+    import heppdap.allevents as allevents
     read_data.init(editmode)
 
 
@@ -354,9 +356,15 @@ class MainPanel(wx.Panel):
 
         #Add graphing button
         self.graphbutton = wx.Button(self, wx.ID_ANY, "Plot")
+        graphallsizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.graphallchannelselect = wx.Choice(self, id = wx.ID_ANY, choices = [])
+        self.graphall = wx.Button(self, wx.ID_ANY, "Plot All Events")
+        self.Bind(wx.EVT_BUTTON, self.graphallevents, self.graphall)
         self.Bind(wx.EVT_BUTTON, self.graphdata, self.graphbutton)
         self.changechannelbutton = wx.Button(self, wx.ID_ANY, "Reconfigure Channels")
         self.Bind(wx.EVT_BUTTON, self.changechannel, self.changechannelbutton)
+        graphallsizer.Add(self.graphallchannelselect, 0, wx.ALL, 0)
+        graphallsizer.Add(self.graphall, 0, wx.ALL, 0)
         #Add Option to go to specific event
         self.gototext = wx.StaticText(self, wx.ID_ANY, "Go To Event #: ")
         self.goto = wx.SpinCtrl(self, wx.ID_ANY)
@@ -368,8 +376,11 @@ class MainPanel(wx.Panel):
         self.gotosizer.Add(self.gotobutton, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         graphSizer = wx.BoxSizer(wx.VERTICAL)
         graphSizer.Add(self.graphbutton, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,0)
+        graphSizer.Add(graphallsizer, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         graphSizer.Add(self.changechannelbutton, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,0)
         graphSizer.Add(self.gotosizer, 0, wx.ALL|wx.ALIGN_CENTER|wx.RESERVE_SPACE_EVEN_IF_HIDDEN,0)
+        self.graphallchannelselect.Hide()
+        self.graphall.Hide()
         self.graphbutton.Hide()
         self.changechannelbutton.Hide()
         self.gototext.Hide()
@@ -538,6 +549,7 @@ class MainPanel(wx.Panel):
             self.goto.SetMax(len(self.data.events))
             self.goto.SetValue(1)
             self.spectrumchannelnumber.SetItems(["None"])
+            self.graphallchannelselect.SetItems(["None"])
             self.showchannels()
         else:
             self.fbtext.AppendText("Select Different File\n")
@@ -547,6 +559,8 @@ class MainPanel(wx.Panel):
     def showchannels(self):
         #Iterate through the channels, and display the ones that read_data has available
         self.graphbutton.Show()
+        self.graphallchannelselect.Show()
+        self.graphall.Show()
         self.risetimeval.SetLabel("")
         self.falltimeval.SetLabel("")
         self.peaktimeval.SetLabel("")
@@ -580,6 +594,7 @@ class MainPanel(wx.Panel):
                 self.channel1.Append(string)
                 self.channel2.Append(string)
                 self.spectrumchannelnumber.Append(string)
+                self.graphallchannelselect.Append(string)
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
                 self.ampmatrix[availablechannels.index(board)][channel - 1].ShowItems(True)
@@ -790,6 +805,11 @@ class MainPanel(wx.Panel):
         hist = spectrums.Spectrumframe(title, data = amps, bins = bins, mode = characteristic.title(), params=params, xmin = xmin, xmax = xmax)
         return
 
+
+    def graphallevents(self, event):
+        channelnum = int(self.graphallchannelselect.GetString(self.graphallchannelselect.GetSelection())[-1]) - 1
+        alleventplot = allevents.Alleventframe(self.data, channelnum) 
+        return
 
     def plotchargespec(self, event):
         plt.figure()
