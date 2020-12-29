@@ -17,11 +17,7 @@ import time
 
 
 
-df = pd.DataFrame({
-    'length': [1.5, 0.5, 1.2, 0.9, 3],
-    'width': [0.7, 0.2, 0.15, 0.2, 1.1]
-    }, index=['pig', 'rabbit', 'duck', 'chicken', 'horse'])
-
+df = [[1,2,3], [4,5,6]]
 
 class Spectrumframe (wx.Frame):
     """
@@ -32,18 +28,39 @@ class Spectrumframe (wx.Frame):
  #       app=wx.App(None)
         super().__init__(None, title=title)
         self.plotter = PlotNotebook(self, id=-1, pos=(100,100), size=(300,300))                
-        axes = self.plotter.add("Plot").gca()
+        axes = self.plotter.add(mode + "Hist").gca()
         axes.hist(data, range=[xmin, xmax], bins = bins)
-        axes.set_xlabel(mode)
+        sigma = data.std()
+        median = np.median(data)
+        mu = data.mean()
+        total = len(data)
+        #dumb if statement to get units, improve?
+        if mode == "Amplitude":
+            modelabel = "Amplitude (mv)"
+        elif mode == "Charge":
+            modelabel = "Charge (C)"
+        elif "Time" in mode:
+            modelabel = mode + " (ns)"
+        else:
+            modelabel = mode
+
+        axes.set_xlabel(modelabel)
         axes.set_ylabel("Number of Events")
         axes.set_title(title)
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+        
+        string = '\n'.join((
+        r'$\mu=%.2f$' % (mu, ),
+        r'$\mathrm{median}=%.2f$' % (median, ),
+        r'$\sigma=%.2f$' % (sigma, ),
+        "n=%d" % total)) 
+
 
         if params != 1:
-            string = ""
             for key in params:
                 string += (key + ": " + params[key] + '\n') 
-            axes.text(0.01, 0.95, string, transform = axes.transAxes, verticalalignment='top', bbox=props)   
+
+        axes.text(0.01, 0.95, string, transform = axes.transAxes, verticalalignment='top', bbox=props)   
         self.Show()
 
 
