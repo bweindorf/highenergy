@@ -36,7 +36,7 @@ class Spectrumframe (wx.Frame):
         total = len(data)
         #dumb if statement to get units, improve?
         if mode == "Amplitude":
-            modelabel = "Amplitude (mv)"
+            modelabel = "Amplitude (V)"
         elif mode == "Charge":
             modelabel = "Charge (C)"
         elif "Time" in mode:
@@ -50,15 +50,15 @@ class Spectrumframe (wx.Frame):
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
         
         string = '\n'.join((
-        r'$\mu=%.2f$' % (mu, ),
-        r'$\mathrm{median}=%.2f$' % (median, ),
-        r'$\sigma=%.2f$' % (sigma, ),
+        r'$\mu=%.5f$' % (mu, ),
+        r'$\mathrm{median}=%.5f$' % (median, ),
+        r'$\sigma=%.5f$' % (sigma, ),
         "n=%d" % total)) 
 
 
-        if params != 1:
-            for key in params:
-                string += (key + ": " + params[key] + '\n') 
+#        if params != 1:
+#            for key in params:
+#                string += (key + ": " + params[key] + '\n') 
 
         axes.text(0.01, 0.95, string, transform = axes.transAxes, verticalalignment='top', bbox=props)   
         self.Show()

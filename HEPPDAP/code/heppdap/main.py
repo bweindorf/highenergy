@@ -437,7 +437,8 @@ class MainPanel(wx.Panel):
         #Add amplitude (waveform) and charge spectrum buttons
         self.spectrumsizer=wx.BoxSizer(wx.HORIZONTAL)
         self.specplot=wx.Button(self, id=wx.ID_ANY, label="Histogram")
-        self.specselect=wx.Choice(self, id=wx.ID_ANY, choices=["Amplitude", "Charge", "Rise Time", "Peak Time", "Fall Time"])
+        self.specselect=wx.Choice(self, id=wx.ID_ANY, choices=["Amplitude", "Charge", "Rise Time", "Peak Time", "Fall Time", "Timing Difference"])
+        self.Bind(wx.EVT_CHOICE, self.on_spectrum_change, self.specselect)
         #self.Bind(wx.EVT_BUTTON, self.plotchargespec, self.chargespec)
         self.spectrumsizer.Add(self.specplot, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.Bind(wx.EVT_BUTTON, self.plotspec, self.specplot)
@@ -450,10 +451,14 @@ class MainPanel(wx.Panel):
         
 
         self.spectrumsettings = wx.BoxSizer(wx.HORIZONTAL)
-        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel Number:")
+        self.spectrumchannelnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Channel:")
+        self.spectrumchannelnumberlabel2 = wx.StaticText(self, id=wx.ID_ANY, label = "Channel:")
         self.spectrumchannelnumber = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
+        self.spectrumchannelnumber2 = wx.Choice(self, id=wx.ID_ANY, choices = ["None"])
         self.spectrumsettings.Add(self.spectrumchannelnumberlabel, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.spectrumsettings.Add(self.spectrumchannelnumber, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.Add(self.spectrumchannelnumberlabel2, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        self.spectrumsettings.Add(self.spectrumchannelnumber2, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
         self.binnumberlabel = wx.StaticText(self, id=wx.ID_ANY, label = "Bins:")
         self.binnumber = wx.SpinCtrl(self, id=wx.ID_ANY)
         self.binnumber.SetMax(1000)
@@ -477,7 +482,7 @@ class MainPanel(wx.Panel):
         self.fbtext = wx.TextCtrl(self, id=wx.ID_ANY, size=(500,200), style = wx.TE_READONLY|wx.TE_LEFT|wx.TE_MULTILINE)
         style = self.fbtext.GetWindowStyle()
         self.fbtext.AppendText("App Log\n")
-        controlSizer.Add(self.fbtext, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN, 0)
+        controlSizer.Add(self.fbtext, 0, wx.ALL|wx.RESERVE_SPACE_EVEN_IF_HIDDEN|wx.BOTTOM, 0)
         #Add sizers to the main sizer (note the result sizer is blank and will be used when a button is clicked)
         self.mainSizer.Add(controlSizer, 1, wx.ALL, 0)
         self.mainSizer.Add(resultSizer, 1, wx.ALL, 5)
@@ -488,6 +493,20 @@ class MainPanel(wx.Panel):
 
         #"switch" for seeing if channel names have been set
         self.channelnamesset = False
+
+    def on_spectrum_change(self, event):
+        s = "_"
+        #Change to all lower case with underscores replacing spaces...
+        characteristic = s.join(self.specselect.GetString(self.specselect.GetSelection()).lower().split())
+        if characteristic == "timing_difference":
+            self.spectrumchannelnumberlabel2.Show()
+            self.spectrumchannelnumber2.Show()
+            return
+
+        else:
+            self.spectrumchannelnumberlabel2.Hide()
+            self.spectrumchannelnumber2.Hide()
+            return
 
     def configchannelname(self, event):
         self.channelnameframe = channelnames.Channelnameframe("Channel Designations", self.data.loadedchannels, self.fname)
@@ -535,6 +554,8 @@ class MainPanel(wx.Panel):
             self.timeSizer.ShowItems(False)
             self.spectrumsizer.ShowItems(True)
             self.spectrumsettings.ShowItems(True)
+            self.spectrumchannelnumberlabel2.Hide()
+            self.spectrumchannelnumber2.Hide()
             self.range.ShowItems(True)
             for board in self.channelmatrix:
                 for channel in board:
@@ -549,6 +570,7 @@ class MainPanel(wx.Panel):
             self.goto.SetMax(len(self.data.events))
             self.goto.SetValue(1)
             self.spectrumchannelnumber.SetItems(["None"])
+            self.spectrumchannelnumber2.SetItems(["None"])
             self.graphallchannelselect.SetItems(["None"])
             self.showchannels()
         else:
@@ -594,6 +616,7 @@ class MainPanel(wx.Panel):
                 self.channel1.Append(string)
                 self.channel2.Append(string)
                 self.spectrumchannelnumber.Append(string)
+                self.spectrumchannelnumber2.Append(string)
                 self.graphallchannelselect.Append(string)
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Show()
                 self.channelmatrix[availablechannels.index(board)][channel - 1].Enable()
@@ -790,7 +813,20 @@ class MainPanel(wx.Panel):
 
         s = "_"
         characteristic = s.join(self.specselect.GetString(self.specselect.GetSelection()).lower().split())
-        amps = self.data.stats["single_channel"][channelnum][characteristic]
+        if characteristic == 'timing_difference':
+            try:
+                channelnum2 = int(self.spectrumchannelnumber2.GetString(self.spectrumchannelnumber2.GetSelection())[-1]) - 1
+            except ValueError:
+                self.fbtext.AppendText("Please Select Second Channel\n")
+                return
+            chan1 = self.data.stats["single_channel"][channelnum]["rise_time"]
+            chan2 = self.data.stats["single_channel"][channelnum2]["rise_time"]
+
+            amps = chan1.subtract(chan2, fill_value=0)
+
+        else:
+            amps = self.data.stats["single_channel"][channelnum][characteristic]
+
         bins = self.binnumber.GetValue()
         title = "Channel %d (Bins = %d)" % (channelnum + 1, bins)
         params = fnameparser.parsefilename(self.dname)
