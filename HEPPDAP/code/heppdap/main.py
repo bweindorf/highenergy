@@ -30,6 +30,7 @@ if editmode:
     import fnameparser
     import allevents
     read_data.init(editmode)
+
 else:
     import heppdap.read_data as read_data
     import heppdap.channelnames as channelnames
@@ -140,6 +141,12 @@ class MainFrame(wx.Frame):
         self.channelname = editMenu.Append(wx.ID_ANY, "Set Channel Names", "Configure Channels")
         self.Bind(wx.EVT_MENU, self.panel.configchannelname, self.channelname)
         self.channelname.Enable(False)
+        #Configure Rise and Fall Parameters
+        self.timingparamconfig = editMenu.Append(wx.ID_ANY, "Configure Timing Parameter", "Configure Parameter")
+        self.Bind(wx.EVT_MENU, self.panel.configtimingparam, self.timingparamconfig)
+        self.timingthresholdconfig = editMenu.Append(wx.ID_ANY, "Configure Timing Threshold", "Configure Threshold")
+        self.Bind(wx.EVT_MENU, self.panel.configtimingthreshold, self.timingthresholdconfig)
+
         menubar.Append(fileMenu, '&File')
         menubar.Append(editMenu, '&Edit')
         self.SetMenuBar(menubar)
@@ -250,6 +257,10 @@ class MainPanel(wx.Panel):
         self.InitForm()        
         self.currentDirectory = os.getcwd()
         #self.SetupScrolling()
+        # Timing Difference Parameters and Threshold Defaults
+        self.timingdiffthreshold = 0.1
+        self.timingdiffparameter = "Rise Time"
+        
 
     def InitForm(self):
         self.oldfile = ""
@@ -512,6 +523,19 @@ class MainPanel(wx.Panel):
         self.channelnameframe = channelnames.Channelnameframe("Channel Designations", self.data.loadedchannels, self.fname)
         self.channelnameframe.SetSize(1000,800)
         self.channelnameframe.Show()
+
+    def configtimingparam(self, event):
+        dlg = wx.SingleChoiceDialog(None, "Current Parameter: %s" % self.timingdiffparameter, "Select Timing Difference Parameter", ["Rise Time", "Peak Time", "Fall Time"])
+        if dlg.ShowModal() == wx.ID_OK:
+            self.timingdiffparameter = dlg.GetStringSelection()
+        dlg.Destroy()    
+
+    def configtimingthreshold(self, event):
+        dlg = wx.SingleChoiceDialog(None, "Current Threshold: %s" % str(self.timingdiffthreshold), "Select Timing Difference Threshold", ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9"])
+        if dlg.ShowModal() == wx.ID_OK:
+            self.timingdiffthreshold = float(dlg.GetStringSelection())
+        dlg.Destroy()    
+
 
     def onOpenFile(self, event):
 #            """
@@ -819,8 +843,9 @@ class MainPanel(wx.Panel):
             except ValueError:
                 self.fbtext.AppendText("Please Select Second Channel\n")
                 return
-            chan1 = self.data.stats["single_channel"][channelnum]["rise_time"]
-            chan2 = self.data.stats["single_channel"][channelnum2]["rise_time"]
+            param = s.join(self.timingdiffparameter.lower().split())
+            chan1 = self.data.stats["single_channel"][channelnum][param]
+            chan2 = self.data.stats["single_channel"][channelnum2][param]
 
             amps = chan1.subtract(chan2, fill_value=0)
 
