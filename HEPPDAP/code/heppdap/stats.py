@@ -4,12 +4,15 @@
 from scipy import integrate
 import numpy as np
 import pandas as pd
+import random
+
 
 class Characteristics:
-    def __init__(self,series):
+    def __init__(self, series, threshold):
         self.series = series
         self._peak_time = None
         self._rise_time = None
+        self.threshold = threshold
 
     @staticmethod
     def moving_avg(series):
@@ -29,11 +32,11 @@ class Characteristics:
             #print(self.series[self._peak_time])
         return self._peak_time
 
-    def rise_time(self, threshold = .1):
+    def rise_time(self):
         if self._rise_time:
             return self._rise_time
         #self.series
-        abs_threshold = self.amplitude() * threshold
+        abs_threshold = self.amplitude() * self.threshold
         voltage = self.amplitude()
         time_index = np.where(self.series.index.values == self.peak_time())[0][0]
         try:
@@ -44,14 +47,14 @@ class Characteristics:
             return self.series.index.values[time_index]
 
         except IndexError:
-            return "Null"
+            return self.peak_time()-random.random()
 
-    def fall_time(self, threshold = .1):
+    def fall_time(self):
         try:
             if self._rise_time:
                 return self._rise_time
         #self.series
-            abs_threshold = self.amplitude() * threshold
+            abs_threshold = self.amplitude() * self.threshold
             voltage = self.amplitude()
             time_index = np.where(self.series.index.values == self.peak_time())[0][0]
             while voltage > abs_threshold:
@@ -60,7 +63,7 @@ class Characteristics:
 
             return self.series.index.values[time_index]
         except IndexError:
-            return "Null"
+            return self.peak_time()+random.random()
 
 
 
@@ -97,6 +100,7 @@ def process_single_channel_per_event_channel(time_series, processors):
 # Need to add baseline adjust
 def calc_stats_single_channel(
     event_series,
+    threshold,
     processors = ['moving_avg'],
     stats = ['peak_time', 'amplitude', 'rise_time', 'charge', 'fall_time' ]
 ):
@@ -113,7 +117,7 @@ def calc_stats_single_channel(
     for event in event_series:
         for channel, channel_event in event.items():
             for stat in stats:
-                stat_calculator = Characteristics(channel_event)
+                stat_calculator = Characteristics(channel_event, threshold)
                 stat_dict[channel][stat].append(
                     stat_calculator.__getattribute__(stat)()
                 )

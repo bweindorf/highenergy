@@ -11,7 +11,11 @@ def init(editmode):
 
     else:
         import heppdap.stats as stats
- 
+
+def setthreshold(thresh):
+    global threshold
+    threshold = thresh
+
 class DrsoscEventStream(object):
     def __init__(self):
         self.events = []
@@ -28,7 +32,7 @@ class DrsoscEventStream(object):
         return self.events.map(lambda event: event[chn_i])
 
     def calc_stats(self):
-        self.stats['single_channel'] = stats.calc_stats_single_channel(self.events)
+        self.stats['single_channel'] = stats.calc_stats_single_channel(self.events, threshold)
         self.stats['freq'] = stats.Stats(self.stats)
         return self.stats
         

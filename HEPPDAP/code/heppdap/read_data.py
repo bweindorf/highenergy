@@ -18,8 +18,9 @@ def init(editmode):
         import heppdap.event_classes as event_classes 
         event_classes.init(editmode)
 
-def read_data(input_filename, textbox):
+def read_data(input_filename, textbox, threshold):
     start_time = time.perf_counter()
+    event_classes.setthreshold(threshold)
     """
     Script to convert binary format to root for DRS4 evaluation boards.
     http://www.psi.ch/drs/evaluation-board
@@ -202,8 +203,8 @@ def read_data(input_filename, textbox):
             NOTE: the channels 0-3 are for the first board and channels 4-7 are for the second board
             """
             wave = (np.array(voltage_ints)/ 65535.) - 0.5
-#            if max(wave) < abs(min(wave)):
-#                wave = wave * -1
+            if max(wave) < abs(min(wave)):
+                wave = wave * -1
             t_arr = np.array(t)[:len(wave)]
             current_event.add_channel(chn_i -1, t_arr, wave)
             # print('Channel', chn_i, 'min = ', channels_v[chn_i-1].min())

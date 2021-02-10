@@ -589,7 +589,7 @@ class MainPanel(wx.Panel):
             while(self.plotter.nb.GetPageCount()):
                 self.plotter.nb.DeletePage(0)
 
-            self.data = Data(f, self.fbtext)
+            self.data = Data(f, self.fbtext, self.timingdiffthreshold)
             self.goto.SetMin(1)
             self.goto.SetMax(len(self.data.events))
             self.goto.SetValue(1)
@@ -888,8 +888,8 @@ class MainPanel(wx.Panel):
 
 
 class Data:
-    def __init__(self, f, textbox):
-        data = read_data.read_data(f, textbox)
+    def __init__(self, f, textbox, threshold):
+        data = read_data.read_data(f, textbox, threshold)
         self.numboards = 2
         #Nested array, each inner array represents one board, numbers appearing in this array will be indexes according to human (1-8) not (0-7)
         self.loadedchannels = [[], []]
